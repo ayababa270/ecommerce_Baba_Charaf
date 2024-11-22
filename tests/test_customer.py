@@ -1,5 +1,5 @@
 from flask import json
-from app import app, db
+from ..customers.app import app, db
 import pytest
 
 @pytest.fixture

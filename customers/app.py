@@ -12,7 +12,6 @@ app = Flask(__name__)
 # Set the URI for the database connection
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:rootpassword@localhost:3307/mydatabase'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tracking for performance
-app.config['SQLALCHEMY_ECHO'] = True
 
 
 # Initialize SQLAlchemy
@@ -54,19 +53,8 @@ class Customer(db.Model):
     wallet = db.Column(db.Float)
     def __init__(self, first_name, last_name, username, password, age, 
                  address, gender, marital_status):
-        """
-        Initialize a new customer instance.
-
-        :param id: The ID of the customer (optional, if provided for existing customer).
-        :param first_name: The first name of the customer.
-        :param last_name: The last name of the customer.
-        :param username: The username of the customer.
-        :param password: The password of the customer.
-        :param age: The age of the customer.
-        :param address: The address of the customer.
-        :param gender: The gender of the customer.
-        :param marital_status: The marital status of the customer.
-        :param wallet: The wallet balance of the customer.
+        """Constructor method
+            wallet value is zero by default
         """
         super(Customer, self).__init__(username=username, first_name = first_name, last_name = last_name, password = password,age = age, address = address, gender = gender,marital_status= marital_status)
         self.wallet = 0
@@ -288,16 +276,13 @@ def update_customer_information(username, token):
     if not any(field in data for field in valid_fields):
         return jsonify({"error": "No valid fields provided for update"}), 400
     
-    # Find the customer by username
     customer = Customer.query.filter_by(username=username).first()
     
-    # If customer not found, return 404 error
     if not customer:
         return jsonify({"error": "Customer not found"}), 404
 
-    # Update the customer information with the provided fields
     for field, value in data.items():
-        if hasattr(customer, field):  # Check if the field exists on the customer model
+        if hasattr(customer, field):  
             setattr(customer, field, value)
 
     try:

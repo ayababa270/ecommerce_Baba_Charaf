@@ -1,3 +1,5 @@
 venv/
 customers/__pycache__/
+inventory/__pycache__/
+tests/__pycache__/
 .pytest_cache/
