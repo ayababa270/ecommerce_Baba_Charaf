@@ -7,11 +7,15 @@ from flask import abort, jsonify, request, Blueprint, make_response, current_app
 from functools import wraps
 import jwt
 import datetime
+import os
 
 app = Flask(__name__)
 
 # Set the URI for the database connection
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:rootpassword@localhost:3307/mydatabase'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'SQLALCHEMY_DATABASE_URI',
+    'mysql+pymysql://root:rootpassword@localhost:3307/mydatabase'  # Default for local testing
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tracking for performance
 
 

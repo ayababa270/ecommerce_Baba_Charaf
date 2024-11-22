@@ -7,11 +7,15 @@ from functools import wraps
 import jwt
 import datetime
 from marshmallow import validates, ValidationError
+import os
 
 app = Flask(__name__)
 
 # Set the URI for the database connection
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:rootpassword@localhost:3307/mydatabase'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'SQLALCHEMY_DATABASE_URI',
+    'mysql+pymysql://root:rootpassword@localhost:3307/mydatabase'  # Default for local testing
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tracking for performance
 
 
