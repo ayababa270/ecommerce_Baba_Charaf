@@ -1,2 +1,3 @@
 venv/
 customers/__pycache__/
+.pytest_cache/
