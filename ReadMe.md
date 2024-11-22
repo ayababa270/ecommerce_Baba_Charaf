@@ -10,3 +10,6 @@
 ### run services:  
 `make customer`  
 `make inventory`  
+
+### generate docs   
+`sphinx-build -b html . ./_build`

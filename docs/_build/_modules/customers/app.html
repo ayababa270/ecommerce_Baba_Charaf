@@ -1,0 +1,605 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>customers.app &mdash; ecommerce_Baba_Charaf 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ecommerce_Baba_Charaf
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">ecommerce_Baba_Charaf</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ecommerce_Baba_Charaf</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">customers.app</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for customers.app</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span>
+<span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="kn">import</span> <span class="n">SQLAlchemy</span>
+<span class="kn">from</span> <span class="nn">flask_marshmallow</span> <span class="kn">import</span> <span class="n">Marshmallow</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">abort</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">make_response</span><span class="p">,</span> <span class="n">current_app</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">import</span> <span class="nn">jwt</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">marshmallow</span> <span class="kn">import</span> <span class="n">validates</span><span class="p">,</span> <span class="n">ValidationError</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Set the URI for the database connection</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mysql+pymysql://root:rootpassword@localhost:3307/mydatabase&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_TRACK_MODIFICATIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Disable modification tracking for performance</span>
+
+
+<span class="c1"># Initialize SQLAlchemy</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLAlchemy</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">ma</span> <span class="o">=</span> <span class="n">Marshmallow</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Customer">
+<a class="viewcode-back" href="../../customer.html#customers.app.Customer">[docs]</a>
+<span class="k">class</span> <span class="nc">Customer</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a model for a customer entity in the database</span>
+
+<span class="sd">    :param id: The ID of the customer. Automatically generated by MySQL.</span>
+<span class="sd">    :type id: int</span>
+<span class="sd">    :param first_name: The first name of the customer.</span>
+<span class="sd">    :type first_name: str</span>
+<span class="sd">    :param last_name: The last name of the customer.</span>
+<span class="sd">    :type last_name: str</span>
+<span class="sd">    :param username: The unique username of the customer.</span>
+<span class="sd">    :type username: str</span>
+<span class="sd">    :param password: The hashed password of the customer.</span>
+<span class="sd">    :type password: str</span>
+<span class="sd">    :param age: The age of the customer.</span>
+<span class="sd">    :type age: int</span>
+<span class="sd">    :param address: The address of the customer.</span>
+<span class="sd">    :type address: str</span>
+<span class="sd">    :param gender: The gender of the customer. Example values: &#39;Male&#39;, &#39;Female&#39;, etc.</span>
+<span class="sd">    :type gender: str</span>
+<span class="sd">    :param marital_status: The marital status of the customer. Example values: &#39;Single&#39;, &#39;Married&#39;, etc.</span>
+<span class="sd">    :type marital_status: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">128</span><span class="p">))</span>
+    <span class="n">age</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">marital_status</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">wallet</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Float</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_name</span><span class="p">,</span> <span class="n">last_name</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> 
+                 <span class="n">address</span><span class="p">,</span> <span class="n">gender</span><span class="p">,</span> <span class="n">marital_status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor method</span>
+<span class="sd">            wallet value is zero by default</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Customer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">first_name</span> <span class="o">=</span> <span class="n">first_name</span><span class="p">,</span> <span class="n">last_name</span> <span class="o">=</span> <span class="n">last_name</span><span class="p">,</span> <span class="n">password</span> <span class="o">=</span> <span class="n">password</span><span class="p">,</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span><span class="p">,</span> <span class="n">address</span> <span class="o">=</span> <span class="n">address</span><span class="p">,</span> <span class="n">gender</span> <span class="o">=</span> <span class="n">gender</span><span class="p">,</span><span class="n">marital_status</span><span class="o">=</span> <span class="n">marital_status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wallet</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema">[docs]</a>
+<span class="k">class</span> <span class="nc">CustomerSchema</span><span class="p">(</span><span class="n">ma</span><span class="o">.</span><span class="n">Schema</span><span class="p">):</span> 
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This schema represents a serialization/deserialization schema for the Customer model.</span>
+<span class="sd">    :cvar Meta: A nested class containing metadata for the schema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CustomerSchema.Meta">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.Meta">[docs]</a>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Metadata for the CustomerSchema class.</span>
+
+<span class="sd">        :cvar fields: A tuple specifying the fields to include in the schema.</span>
+<span class="sd">        :vartype fields: tuple</span>
+<span class="sd">        :cvar model: The model that this schema is based on.</span>
+<span class="sd">        :vartype model: type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;first_name&quot;</span><span class="p">,</span> <span class="s2">&quot;last_name&quot;</span><span class="p">,</span> <span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">,</span> <span class="s2">&quot;gender&quot;</span><span class="p">,</span> <span class="s2">&quot;marital_status&quot;</span><span class="p">,</span> <span class="s2">&quot;wallet&quot;</span><span class="p">)</span> 
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Customer</span> </div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_first_name">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_first_name">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;first_name&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_first_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;First name must be at least 2 characters long.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_last_name">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_last_name">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;last_name&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_last_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Last name must be at least 2 characters long.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_username">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_username">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_username</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Username must be at least 5 characters long.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_password">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_password">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Password must be at least 6 characters long.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_age">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_age">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_age</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">18</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Age must be between 18 and 100.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_address">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_address">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Address must be at least 10 characters long.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_gender">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_gender">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;gender&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_gender</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">valid_genders</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;male&#39;</span><span class="p">,</span> <span class="s1">&#39;female&#39;</span><span class="p">,</span> <span class="s1">&#39;other&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_genders</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gender must be one of the following: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_genders</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_marital_status">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_marital_status">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;marital_status&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_marital_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">valid_statuses</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;single&#39;</span><span class="p">,</span> <span class="s1">&#39;married&#39;</span><span class="p">,</span> <span class="s1">&#39;divorced&#39;</span><span class="p">,</span> <span class="s1">&#39;widowed&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_statuses</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Marital status must be one of the following: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_statuses</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CustomerSchema.validate_wallet">
+<a class="viewcode-back" href="../../customer.html#customers.app.CustomerSchema.validate_wallet">[docs]</a>
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;wallet&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_wallet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Wallet balance cannot be negative.&quot;</span><span class="p">)</span></div>
+</div>
+
+
+<span class="n">customer_schema</span> <span class="o">=</span> <span class="n">CustomerSchema</span><span class="p">()</span>
+<span class="n">customers_schema</span> <span class="o">=</span> <span class="n">CustomerSchema</span><span class="p">(</span><span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="create_customer">
+<a class="viewcode-back" href="../../customer.html#customers.app.create_customer">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/create_customer&quot;</span><span class="p">,</span> <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">create_customer</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a new customer from the information in the request body. Inserts it into the customer table.</span>
+<span class="sd">    :return: A tuple containing a JSON response and an HTTP status code.</span>
+<span class="sd">    - If any required field is missing: JSON error message and status code 400.</span>
+<span class="sd">    - If &#39;age&#39; is not an integer: JSON error message and status code 400.</span>
+<span class="sd">    - If the customer is created successfully: JSON with customer attributes and status code 201.</span>
+<span class="sd">    - If a database error occurs: JSON error message and status code 500.</span>
+<span class="sd">    :rtype: tuple[dict, int]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;marital_status&#39;</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing required fields&quot;</span><span class="p">}),</span> <span class="mi">400</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;bad age&quot;</span><span class="p">}),</span> <span class="mi">400</span>
+
+    <span class="n">new_customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span>
+        <span class="n">first_name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;first_name&#39;</span><span class="p">],</span>
+        <span class="n">last_name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;last_name&#39;</span><span class="p">],</span>
+        <span class="n">username</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+        <span class="n">password</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span>
+        <span class="n">age</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span>  
+        <span class="n">address</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">],</span>
+        <span class="n">gender</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;gender&#39;</span><span class="p">],</span>
+        <span class="n">marital_status</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;marital_status&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Add the customer to the session and commit</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_customer</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="c1"># Return success response with customer info (or just a success message)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">get_customer_by_username</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">json</span><span class="p">),</span> <span class="mi">201</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>  <span class="c1"># Rollback in case of error</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span></div>
+
+    
+
+<div class="viewcode-block" id="get_customer_by_username">
+<a class="viewcode-back" href="../../customer.html#customers.app.get_customer_by_username">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/get_customer_by_username/&lt;username&gt;&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">get_customer_by_username</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves a customer by their username.</span>
+
+<span class="sd">    :param username: The username of the customer to retrieve.</span>
+<span class="sd">    :type username: str</span>
+<span class="sd">    :return: A tuple containing a JSON response and an HTTP status code.</span>
+<span class="sd">        - If the customer is not found: JSON error message and status code 404.</span>
+<span class="sd">        - If the customer is found: JSON with customer attributes and status code 200.</span>
+<span class="sd">    :rtype: tuple[dict, int]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Customer not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
+    
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">customer_schema</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">c</span><span class="p">)),</span> <span class="mi">200</span></div>
+
+
+
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s2">&quot;b&#39;|</span><span class="se">\xe7\xbf</span><span class="s2">U3`</span><span class="se">\xc4\xec\xa7\xa9</span><span class="s2">zf:}</span><span class="se">\xb5\xc7\xb9\x13</span><span class="s2">9^3@Dv&#39;&quot;</span>
+
+<div class="viewcode-block" id="create_token">
+<a class="viewcode-back" href="../../customer.html#customers.app.create_token">[docs]</a>
+<span class="k">def</span> <span class="nf">create_token</span><span class="p">(</span><span class="n">username</span><span class="p">):</span> 
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a JWT token for the specified username.</span>
+
+<span class="sd">    :param username: The username for which the token is generated.</span>
+<span class="sd">    :type username: str</span>
+<span class="sd">    :return: A JWT token as a string.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span> 
+        <span class="s1">&#39;exp&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> 
+        <span class="s1">&#39;iat&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span> 
+        <span class="s1">&#39;sub&#39;</span><span class="p">:</span> <span class="n">username</span>
+    <span class="p">}</span> 
+    <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span> 
+        <span class="n">payload</span><span class="p">,</span> 
+        <span class="n">SECRET_KEY</span><span class="p">,</span> 
+        <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;HS256&#39;</span> 
+    <span class="p">)</span> </div>
+
+
+<div class="viewcode-block" id="token_required">
+<a class="viewcode-back" href="../../customer.html#customers.app.token_required">[docs]</a>
+<span class="k">def</span> <span class="nf">token_required</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A decorator function that checks if a valid JWT token is provided in the request cookies.</span>
+<span class="sd">    If the token is missing or invalid, it aborts the request with a 403 status code.</span>
+
+<span class="sd">    :param f: The original function to be wrapped.</span>
+<span class="sd">    :type f: function</span>
+<span class="sd">    :return: The wrapped function with the username as a parameter if the token is valid.</span>
+<span class="sd">    :rtype: function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;jwt-token&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+            <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">SECRET_KEY</span><span class="p">,</span> <span class="n">algorithms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;HS256&quot;</span><span class="p">])</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;sub&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+<div class="viewcode-block" id="login">
+<a class="viewcode-back" href="../../customer.html#customers.app.login">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">login</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Authenticates a user by validating the username and password. If authentication is successful,</span>
+<span class="sd">    a JWT token is created and sent back in a cookie.</span>
+
+<span class="sd">    :return: A response with a success message and the JWT token set as a cookie if authentication is successful.</span>
+<span class="sd">    :rtype: Response</span>
+<span class="sd">    :raises: 403 Forbidden if authentication fails due to incorrect credentials.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="n">password</span><span class="p">:</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">create_token</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">make_response</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;authentication successful&quot;</span><span class="p">})</span>
+        <span class="n">resp</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span><span class="s1">&#39;jwt-token&#39;</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> 
+                            <span class="n">httponly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1">#to prevent javascript from accessing cookie</span>
+                            <span class="n">secure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># Only send cookie over HTTPS</span>
+                            <span class="n">samesite</span><span class="o">=</span><span class="s1">&#39;Lax&#39;</span> 
+                            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">resp</span> 
+    
+    <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="delete_customer">
+<a class="viewcode-back" href="../../customer.html#customers.app.delete_customer">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/delete_customer&quot;</span><span class="p">,</span> <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DELETE&quot;</span><span class="p">])</span>
+<span class="nd">@token_required</span>
+<span class="k">def</span> <span class="nf">delete_customer</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The logged in user only may delete his account (token required)</span>
+<span class="sd">    Deletes a customer from the database based on the provided username. The request must be authenticated with a valid JWT token.</span>
+<span class="sd">    </span>
+<span class="sd">    :param username: The username of the customer to be deleted, extracted from the JWT token.</span>
+<span class="sd">    :type username: str</span>
+<span class="sd">    :param token: The JWT token used for authentication (passed by the decorator).</span>
+<span class="sd">    :type token: str</span>
+<span class="sd">    :return: A response indicating the success or failure of the deletion.</span>
+<span class="sd">    :rtype: Response</span>
+<span class="sd">    :raises: 404 Not Found if the customer does not exist.</span>
+<span class="sd">    :raises: 500 Internal Server Error if there is an issue during the deletion process.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    
+    <span class="c1"># If customer not found, return 404 error</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">customer</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Customer not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">customer</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        
+        <span class="c1"># Return a success message</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Customer deleted successfully&quot;</span><span class="p">}),</span> <span class="mi">200</span>
+    
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span></div>
+
+
+<div class="viewcode-block" id="update_customer_information">
+<a class="viewcode-back" href="../../customer.html#customers.app.update_customer_information">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/update_customer_information&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PUT&quot;</span><span class="p">])</span>
+<span class="nd">@token_required</span>
+<span class="k">def</span> <span class="nf">update_customer_information</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The logged in user only may update his info</span>
+<span class="sd">    Updates the customer information. The request can contain one or more fields to update (e.g., first_name, last_name, etc.).</span>
+<span class="sd">    Only the provided fields will be updated, and the rest will remain unchanged.</span>
+
+<span class="sd">    :param username: The username of the customer whose information is to be updated, extracted from the JWT token.</span>
+<span class="sd">    :type username: str</span>
+<span class="sd">    :param token: The JWT token used for authentication (passed by the decorator).</span>
+<span class="sd">    :type token: str</span>
+<span class="sd">    :return: A response indicating the success or failure of the update operation.</span>
+<span class="sd">    :rtype: Response</span>
+<span class="sd">    :raises: 404 Not Found if the customer does not exist.</span>
+<span class="sd">    :raises: 400 Bad Request if no valid fields are provided for update.</span>
+<span class="sd">    :raises: 500 Internal Server Error if there is an issue during the update process.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span>  
+    <span class="c1"># Prevent updating wallet value</span>
+    <span class="k">if</span> <span class="s1">&#39;wallet&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+    <span class="c1"># Validate if at least one valid field is provided</span>
+    <span class="n">valid_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;marital_status&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">valid_fields</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No valid fields provided for update&quot;</span><span class="p">}),</span> <span class="mi">400</span>
+    
+    <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">customer</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Customer not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
+
+    <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">customer</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>  
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">customer</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span> <span class="n">customer_schema</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">customer</span><span class="p">)),</span> <span class="mi">200</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span></div>
+
+
+<div class="viewcode-block" id="get_all_customers">
+<a class="viewcode-back" href="../../customer.html#customers.app.get_all_customers">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/get_all_customers&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">get_all_customers</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches all customers from the database.</span>
+
+<span class="sd">    :return: A JSON response containing all customers.</span>
+<span class="sd">    :rtype: Response</span>
+<span class="sd">    :raises: 500 Internal Server Error if there is an issue retrieving customer data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">customers</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">customers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;No customers found&quot;</span><span class="p">}),</span> <span class="mi">200</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">customers_schema</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">customers</span><span class="p">)),</span> <span class="mi">200</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span></div>
+
+
+<div class="viewcode-block" id="charge_wallet">
+<a class="viewcode-back" href="../../customer.html#customers.app.charge_wallet">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/charge_wallet&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="nd">@token_required</span>
+<span class="k">def</span> <span class="nf">charge_wallet</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Only the logged in customer may charge his account</span>
+<span class="sd">    Charge a customer&#39;s wallet by adding a specified amount in dollars.</span>
+<span class="sd">    </span>
+<span class="sd">    :param username: The username of the customer.</span>
+<span class="sd">    :param token: The JWT token for authentication.</span>
+<span class="sd">    :return: A success message with updated wallet balance, or an error message.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span>
+    
+    <span class="n">amount</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;amount&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">amount</span> <span class="ow">or</span> <span class="n">amount</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid or missing amount&quot;</span><span class="p">}),</span> <span class="mi">400</span>
+    
+    <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">customer</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Customer not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
+    
+    <span class="n">customer</span><span class="o">.</span><span class="n">wallet</span> <span class="o">+=</span> <span class="n">amount</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Wallet charged successfully&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;new_balance&quot;</span><span class="p">:</span> <span class="n">customer</span><span class="o">.</span><span class="n">wallet</span>
+        <span class="p">}),</span> <span class="mi">200</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span></div>
+
+
+<div class="viewcode-block" id="deduct_wallet">
+<a class="viewcode-back" href="../../customer.html#customers.app.deduct_wallet">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/deduct_wallet&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="nd">@token_required</span>
+<span class="k">def</span> <span class="nf">deduct_wallet</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Only the logged in user may cause money to be deducted from his account</span>
+<span class="sd">    Deduct money from a customer&#39;s wallet.</span>
+<span class="sd">    :param username: The username of the customer.</span>
+<span class="sd">    :param token: The JWT token for authentication.</span>
+<span class="sd">    :return: A success message with updated wallet balance, or an error message.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span>
+    
+    <span class="n">amount</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;amount&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">amount</span> <span class="ow">or</span> <span class="n">amount</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid or missing amount&quot;</span><span class="p">}),</span> <span class="mi">400</span>
+    
+    <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">customer</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Customer not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
+    
+    <span class="k">if</span> <span class="n">customer</span><span class="o">.</span><span class="n">wallet</span> <span class="o">&lt;</span> <span class="n">amount</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Insufficient funds&quot;</span><span class="p">}),</span> <span class="mi">400</span>
+    
+    <span class="n">customer</span><span class="o">.</span><span class="n">wallet</span> <span class="o">-=</span> <span class="n">amount</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Money deducted successfully&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;new_balance&quot;</span><span class="p">:</span> <span class="n">customer</span><span class="o">.</span><span class="n">wallet</span>
+        <span class="p">}),</span> <span class="mi">200</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, AYA BABA, AYMAN CHARAF.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

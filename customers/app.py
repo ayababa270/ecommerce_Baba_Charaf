@@ -133,10 +133,10 @@ def create_customer():
     """
     Creates a new customer from the information in the request body. Inserts it into the customer table.
     :return: A tuple containing a JSON response and an HTTP status code.
-        - If any required field is missing: JSON error message and status code 400.
-        - If 'age' is not an integer: JSON error message and status code 400.
-        - If the customer is created successfully: JSON with customer attributes and status code 201.
-        - If a database error occurs: JSON error message and status code 500.
+    - If any required field is missing: JSON error message and status code 400.
+    - If 'age' is not an integer: JSON error message and status code 400.
+    - If the customer is created successfully: JSON with customer attributes and status code 201.
+    - If a database error occurs: JSON error message and status code 500.
     :rtype: tuple[dict, int]
     """
     data = request.json
