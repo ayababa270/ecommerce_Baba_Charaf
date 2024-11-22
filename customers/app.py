@@ -6,6 +6,7 @@ from flask import abort, jsonify, request, Blueprint, make_response, current_app
 from functools import wraps
 import jwt
 import datetime
+from marshmallow import validates, ValidationError
 
 app = Flask(__name__)
 
@@ -76,6 +77,53 @@ class CustomerSchema(ma.Schema):
         fields = ("id", "first_name", "last_name", "username", "password",
                   "age", "address", "gender", "marital_status", "wallet") 
         model = Customer 
+
+    @validates('first_name')
+    def validate_first_name(self, value):
+        if not value or len(value) < 2:
+            raise ValidationError("First name must be at least 2 characters long.")
+
+    @validates('last_name')
+    def validate_last_name(self, value):
+        if not value or len(value) < 2:
+            raise ValidationError("Last name must be at least 2 characters long.")
+
+    @validates('username')
+    def validate_username(self, value):
+        if not value or len(value) < 5:
+            raise ValidationError("Username must be at least 5 characters long.")
+
+    @validates('password')
+    def validate_password(self, value):
+        if not value or len(value) < 6:
+            raise ValidationError("Password must be at least 6 characters long.")
+
+    @validates('age')
+    def validate_age(self, value):
+        if value < 18 or value > 100:
+            raise ValidationError("Age must be between 18 and 100.")
+
+    @validates('address')
+    def validate_address(self, value):
+        if not value or len(value) < 10:
+            raise ValidationError("Address must be at least 10 characters long.")
+
+    @validates('gender')
+    def validate_gender(self, value):
+        valid_genders = ['male', 'female', 'other']
+        if value.lower() not in valid_genders:
+            raise ValidationError(f"Gender must be one of the following: {', '.join(valid_genders)}.")
+
+    @validates('marital_status')
+    def validate_marital_status(self, value):
+        valid_statuses = ['single', 'married', 'divorced', 'widowed']
+        if value.lower() not in valid_statuses:
+            raise ValidationError(f"Marital status must be one of the following: {', '.join(valid_statuses)}.")
+
+    @validates('wallet')
+    def validate_wallet(self, value):
+        if value < 0:
+            raise ValidationError("Wallet balance cannot be negative.")
 
 customer_schema = CustomerSchema()
 customers_schema = CustomerSchema(many=True)
