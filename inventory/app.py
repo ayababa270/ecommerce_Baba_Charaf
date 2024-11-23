@@ -194,8 +194,13 @@ def update_good_information(product_id):
     :raises: 400 Bad Request if no valid fields are provided for update.
     :raises: 500 Internal Server Error if there is an issue during the update process.
     """
+    data = {}
     try:
         data = goods_schema.load(request.json)
+    except:
+        abort(400)
+    try:
+        
 
         valid_fields = ['name', 'category', 'price_per_item', 'description', 'count_in_stock']
         if not any(field in data for field in valid_fields):

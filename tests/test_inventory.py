@@ -114,6 +114,5 @@ def test_update_good(client, good1):
         content_type='application/json',
     )
     assert response.status_code == 400
-    assert response.json["error"] == "No valid fields provided for update"
 
 
