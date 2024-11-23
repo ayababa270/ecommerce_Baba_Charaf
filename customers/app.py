@@ -8,8 +8,12 @@ import jwt
 import datetime
 from marshmallow import validates, ValidationError
 import os
+from werkzeug.middleware.profiler import ProfilerMiddleware
+import memory_profiler as mp
 
 app = Flask(__name__)
+
+app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/customer", restrictions=('app.py',))
 
 # Set the URI for the database connection
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
@@ -133,6 +137,7 @@ customer_schema = CustomerSchema()
 customers_schema = CustomerSchema(many=True)
 
 @app.route("/create_customer", methods = ["POST"])
+@mp.profile
 def create_customer():
     """
     Creates a new customer from the information in the request body. Inserts it into the customer table.
@@ -176,6 +181,7 @@ def create_customer():
     
 
 @app.route("/get_customer_by_username/<username>", methods=["GET"])
+@mp.profile
 def get_customer_by_username(username):
     """
     Retrieves a customer by their username.
@@ -243,6 +249,7 @@ def token_required(f):
     return decorator
 
 @app.route("/login", methods = ["POST"])
+@mp.profile
 def login():
     """
     Authenticates a user by validating the username and password. If authentication is successful,
@@ -270,6 +277,7 @@ def login():
 
 @app.route("/delete_customer", methods = ["DELETE"])
 @token_required
+@mp.profile
 def delete_customer(username, token):
     """
     The logged in user only may delete his account (token required)
@@ -303,6 +311,7 @@ def delete_customer(username, token):
 
 @app.route("/update_customer_information", methods=["PUT"])
 @token_required
+@mp.profile
 def update_customer_information(username, token):
     """
     The logged in user only may update his info
@@ -346,6 +355,7 @@ def update_customer_information(username, token):
         return jsonify({"error": str(e)}), 500
 
 @app.route("/get_all_customers", methods=["GET"])
+@mp.profile
 def get_all_customers():
     """
     Fetches all customers from the database.
@@ -366,6 +376,7 @@ def get_all_customers():
 
 @app.route("/charge_wallet", methods=["POST"])
 @token_required
+@mp.profile
 def charge_wallet(username, token):
     """
     Only the logged in customer may charge his account

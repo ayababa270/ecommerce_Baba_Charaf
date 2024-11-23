@@ -8,8 +8,12 @@ from functools import wraps
 import jwt
 import datetime
 import os
+from werkzeug.middleware.profiler import ProfilerMiddleware
+import memory_profiler as mp
 
 app = Flask(__name__)
+
+app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/inventory", restrictions=('app.py',))  # Save profiles to a directory
 
 # Set the URI for the database connection
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
@@ -102,6 +106,7 @@ goods_list_schema = GoodsSchema(many=True)
 
 
 @app.route('/add_good', methods=['POST'])
+@mp.profile
 def add_good():
     """
     Adds a new good to the inventory.
@@ -134,6 +139,7 @@ def add_good():
         return jsonify({"error": f"An error occurred while adding the good: {str(e)}"}), 500
 
 @app.route('/delete_good/<int:product_id>', methods=['DELETE'])
+@mp.profile
 def delete_good(product_id):
     """
     Deletes a product (good) from the database by its ID.
@@ -164,6 +170,7 @@ def delete_good(product_id):
 
 
 @app.route("/update_good/<int:product_id>", methods=["PUT"])
+@mp.profile
 def update_good_information(product_id):
     """
     Updates the information of a specific product (good). The request can contain one or more fields to update 

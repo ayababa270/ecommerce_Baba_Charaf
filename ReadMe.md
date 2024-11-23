@@ -13,3 +13,6 @@
 
 ### generate docs   
 `sphinx-build -b html . ./_build`
+
+### build all containers  
+`docker-compose up --build`
