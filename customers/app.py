@@ -341,25 +341,26 @@ def update_customer_information(username, token):
     :raises: 400 Bad Request if no valid fields are provided for update.
     :raises: 500 Internal Server Error if there is an issue during the update process.
     """
-    data = request.json  
-    # Prevent updating wallet value
-    if 'wallet' in data:
-        abort(403)
-    # Validate if at least one valid field is provided
-    valid_fields = ['first_name', 'last_name', 'username', 'password', 'age', 'address', 'gender', 'marital_status']
-    if not any(field in data for field in valid_fields):
-        return jsonify({"error": "No valid fields provided for update"}), 400
-    
-    customer = Customer.query.filter_by(username=username).first()
-    
-    if not customer:
-        return jsonify({"error": "Customer not found"}), 404
-
-    for field, value in data.items():
-        if hasattr(customer, field):  
-            setattr(customer, field, value)
 
     try:
+        data = customer_schema.load(request.json)
+        # Prevent updating wallet value
+        if 'wallet' in data:
+            abort(403)
+        # Validate if at least one valid field is provided
+        valid_fields = ['first_name', 'last_name', 'username', 'password', 'age', 'address', 'gender', 'marital_status']
+        if not any(field in data for field in valid_fields):
+            return jsonify({"error": "No valid fields provided for update"}), 400
+        
+        customer = Customer.query.filter_by(username=username).first()
+        
+        if not customer:
+            return jsonify({"error": "Customer not found"}), 404
+
+        for field, value in data.items():
+            if hasattr(customer, field):  
+                setattr(customer, field, value)
+
         db.session.commit()
         return jsonify( customer_schema.dump(customer)), 200
 

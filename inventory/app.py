@@ -194,22 +194,21 @@ def update_good_information(product_id):
     :raises: 400 Bad Request if no valid fields are provided for update.
     :raises: 500 Internal Server Error if there is an issue during the update process.
     """
-    data = request.json  
-
-    valid_fields = ['name', 'category', 'price_per_item', 'description', 'count_in_stock']
-    if not any(field in data for field in valid_fields):
-        return jsonify({"error": "No valid fields provided for update"}), 400
-
-    product = Goods.query.get(product_id)
-    
-    if not product:
-        return jsonify({"error": "Product not found"}), 404
-
-    for field, value in data.items():
-        if field in valid_fields:  
-            setattr(product, field, value)
-
     try:
+        data = goods_schema.load(request.json)
+
+        valid_fields = ['name', 'category', 'price_per_item', 'description', 'count_in_stock']
+        if not any(field in data for field in valid_fields):
+            return jsonify({"error": "No valid fields provided for update"}), 400
+
+        product = Goods.query.get(product_id)
+        
+        if not product:
+            return jsonify({"error": "Product not found"}), 404
+
+        for field, value in data.items():
+            if field in valid_fields:  
+                setattr(product, field, value)
         db.session.commit()  
         return jsonify({"message": "Product updated successfully", "product": goods_schema.dump(product)}), 200
     except Exception as e:
