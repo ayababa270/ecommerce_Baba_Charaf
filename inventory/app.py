@@ -15,7 +15,8 @@ from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 
-app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/inventory", restrictions=('app.py',))  # Save profiles to a directory
+# Uncomment this to profile again
+#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/inventory", restrictions=('app.py',))  # Save profiles to a directory
 
 # Set the URI for the database connection
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
@@ -224,4 +225,4 @@ def update_good_information(product_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5001)
+    app.run(host="0.0.0.0", port=5001)

@@ -15,7 +15,8 @@ from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 
-app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/customer", restrictions=('app.py',))
+# Uncomment this to profile again
+#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/customer", restrictions=('app.py',))
 
 limiter = Limiter(
     get_remote_address,  # Uses client's IP address for rate-limiting
@@ -467,4 +468,4 @@ def deduct_wallet(username, token):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)

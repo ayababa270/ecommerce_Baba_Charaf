@@ -27,7 +27,7 @@ services:
     networks:
       - my_network
     ports:
-      - "5001:5000"
+      - "5001:5001"
     depends_on:
       mysql:
         condition: service_healthy
