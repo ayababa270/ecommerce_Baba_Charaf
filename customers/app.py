@@ -10,10 +10,18 @@ from marshmallow import validates, ValidationError
 import os
 from werkzeug.middleware.profiler import ProfilerMiddleware
 import memory_profiler as mp
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 
 app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/customer", restrictions=('app.py',))
+
+limiter = Limiter(
+    get_remote_address,  # Uses client's IP address for rate-limiting
+    app=app,
+    default_limits=["200 per day", "50 per hour"],  # Global rate limits
+)
 
 # Set the URI for the database connection
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
@@ -137,6 +145,7 @@ customer_schema = CustomerSchema()
 customers_schema = CustomerSchema(many=True)
 
 @app.route("/create_customer", methods = ["POST"])
+@limiter.limit("50 per minute")
 @mp.profile
 def create_customer():
     """
@@ -181,6 +190,7 @@ def create_customer():
     
 
 @app.route("/get_customer_by_username/<username>", methods=["GET"])
+@limiter.limit("50 per minute")
 @mp.profile
 def get_customer_by_username(username):
     """
@@ -249,6 +259,7 @@ def token_required(f):
     return decorator
 
 @app.route("/login", methods = ["POST"])
+@limiter.limit("50 per minute")
 @mp.profile
 def login():
     """
@@ -276,6 +287,7 @@ def login():
     abort(403)
 
 @app.route("/delete_customer", methods = ["DELETE"])
+@limiter.limit("50 per minute")
 @token_required
 @mp.profile
 def delete_customer(username, token):
@@ -310,6 +322,7 @@ def delete_customer(username, token):
         return jsonify({"error": str(e)}), 500
 
 @app.route("/update_customer_information", methods=["PUT"])
+@limiter.limit("50 per minute")
 @token_required
 @mp.profile
 def update_customer_information(username, token):
@@ -355,6 +368,7 @@ def update_customer_information(username, token):
         return jsonify({"error": str(e)}), 500
 
 @app.route("/get_all_customers", methods=["GET"])
+@limiter.limit("50 per minute")
 @mp.profile
 def get_all_customers():
     """
@@ -375,6 +389,7 @@ def get_all_customers():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/charge_wallet", methods=["POST"])
+@limiter.limit("50 per minute")
 @token_required
 @mp.profile
 def charge_wallet(username, token):
@@ -410,6 +425,7 @@ def charge_wallet(username, token):
         return jsonify({"error": str(e)}), 500
 
 @app.route("/deduct_wallet", methods=["POST"])
+@limiter.limit("50 per minute")
 @token_required
 def deduct_wallet(username, token):
     """

@@ -10,6 +10,8 @@ import datetime
 import os
 from werkzeug.middleware.profiler import ProfilerMiddleware
 import memory_profiler as mp
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 
@@ -22,6 +24,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tracking for performance
 
+limiter = Limiter(
+    get_remote_address,  # Uses client's IP address for rate-limiting
+    app=app,
+    default_limits=["200 per day", "50 per hour"],  # Global rate limits
+)
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
@@ -106,6 +113,7 @@ goods_list_schema = GoodsSchema(many=True)
 
 
 @app.route('/add_good', methods=['POST'])
+@limiter.limit("50 per minute")
 @mp.profile
 def add_good():
     """
@@ -139,6 +147,7 @@ def add_good():
         return jsonify({"error": f"An error occurred while adding the good: {str(e)}"}), 500
 
 @app.route('/delete_good/<int:product_id>', methods=['DELETE'])
+@limiter.limit("50 per minute")
 @mp.profile
 def delete_good(product_id):
     """
@@ -170,6 +179,7 @@ def delete_good(product_id):
 
 
 @app.route("/update_good/<int:product_id>", methods=["PUT"])
+@limiter.limit("50 per minute")
 @mp.profile
 def update_good_information(product_id):
     """
