@@ -283,6 +283,10 @@ def login():
     username = request.json['username']
     password = request.json['password']
     c = Customer.query.filter_by(username=username).first()
+    
+    if not c:
+        return jsonify({"error": "User not found"}), 404
+    
     if c.password == password:
         token = create_token(username)
         resp = make_response({"message": "authentication successful"})
