@@ -113,6 +113,36 @@ goods_schema = GoodsSchema()
 goods_list_schema = GoodsSchema(many=True)
 
 
+@app.route('/goods', methods=['GET'])
+def get_all_goods():
+    goods = Goods.query.all()
+    return jsonify(goods_list_schema.dump(goods)), 200
+
+
+@app.route('/goods/<string:good_name>', methods=['GET'])
+def get_good_by_name(good_name):
+    good = Goods.query.filter_by(name=good_name).first()
+    if not good:
+        return jsonify({'error': 'Good not found'}), 404
+    return jsonify(goods_schema.dump(good)), 200
+
+
+@app.route('/decrease_stock/<string:good_name>', methods=['POST'])
+def decrease_stock(good_name):
+    good = Goods.query.filter_by(name=good_name).first()
+    if not good:
+        return jsonify({'error': 'Good not found'}), 404
+    if good.count_in_stock <= 0:
+        return jsonify({'error': 'No stock available'}), 400
+    good.count_in_stock -= 1
+    try:
+        db.session.commit()
+        return jsonify({'message': 'Stock decreased', 'new_count': good.count_in_stock}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/add_good', methods=['POST'])
 @limiter.limit("50 per minute")
 @mp.profile
