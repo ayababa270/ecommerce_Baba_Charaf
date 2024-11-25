@@ -8,8 +8,8 @@ import jwt
 import datetime
 from marshmallow import validates, ValidationError
 import os
-from werkzeug.middleware.profiler import ProfilerMiddleware
-import memory_profiler as mp
+#from werkzeug.middleware.profiler import ProfilerMiddleware
+#import memory_profiler as mp
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
@@ -147,7 +147,7 @@ customers_schema = CustomerSchema(many=True)
 
 @app.route("/create_customer", methods = ["POST"])
 @limiter.limit("50 per minute")
-@mp.profile
+#@mp.profile
 def create_customer():
     """
     Creates a new customer from the information in the request body. Inserts it into the customer table.
@@ -192,7 +192,7 @@ def create_customer():
 
 @app.route("/get_customer_by_username/<username>", methods=["GET"])
 @limiter.limit("50 per minute")
-@mp.profile
+#@mp.profile
 def get_customer_by_username(username):
     """
     Retrieves a customer by their username.
@@ -261,7 +261,7 @@ def token_required(f):
 
 @app.route("/login", methods = ["POST"])
 @limiter.limit("50 per minute")
-@mp.profile
+#@mp.profile
 def login():
     """
     Authenticates a user by validating the username and password. If authentication is successful,
@@ -290,7 +290,7 @@ def login():
 @app.route("/delete_customer", methods = ["DELETE"])
 @limiter.limit("50 per minute")
 @token_required
-@mp.profile
+#@mp.profile
 def delete_customer(username, token):
     """
     The logged in user only may delete his account (token required)
@@ -325,7 +325,7 @@ def delete_customer(username, token):
 @app.route("/update_customer_information", methods=["PUT"])
 @limiter.limit("50 per minute")
 @token_required
-@mp.profile
+#@mp.profile
 def update_customer_information(username, token):
     """
     The logged in user only may update his info
@@ -371,7 +371,7 @@ def update_customer_information(username, token):
 
 @app.route("/get_all_customers", methods=["GET"])
 @limiter.limit("50 per minute")
-@mp.profile
+#@mp.profile
 def get_all_customers():
     """
     Fetches all customers from the database.
@@ -393,7 +393,7 @@ def get_all_customers():
 @app.route("/charge_wallet", methods=["POST"])
 @limiter.limit("50 per minute")
 @token_required
-@mp.profile
+#@mp.profile
 def charge_wallet(username, token):
     """
     Only the logged in customer may charge his account

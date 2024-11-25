@@ -8,8 +8,8 @@ from functools import wraps
 import jwt
 import datetime
 import os
-from werkzeug.middleware.profiler import ProfilerMiddleware
-import memory_profiler as mp
+#from werkzeug.middleware.profiler import ProfilerMiddleware
+#import memory_profiler as mp
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
@@ -145,7 +145,7 @@ def decrease_stock(good_name):
 
 @app.route('/add_good', methods=['POST'])
 @limiter.limit("50 per minute")
-@mp.profile
+#@mp.profile
 def add_good():
     """
     Adds a new good to the inventory.
@@ -179,7 +179,7 @@ def add_good():
 
 @app.route('/delete_good/<int:product_id>', methods=['DELETE'])
 @limiter.limit("50 per minute")
-@mp.profile
+#@mp.profile
 def delete_good(product_id):
     """
     Deletes a product (good) from the database by its ID.
@@ -211,7 +211,7 @@ def delete_good(product_id):
 
 @app.route("/update_good/<int:product_id>", methods=["PUT"])
 @limiter.limit("50 per minute")
-@mp.profile
+#@mp.profile
 def update_good_information(product_id):
     """
     Updates the information of a specific product (good). The request can contain one or more fields to update 
