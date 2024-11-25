@@ -234,7 +234,16 @@ def create_token(username):
         payload, 
         SECRET_KEY, 
         algorithm='HS256' 
-    ) 
+    )
+
+# Custom error handler for 405 errors
+@app.errorhandler(405)
+def forbidden_error(error):
+    response = {
+        "error": "Forbidden",
+        "message": "No token provided. Please log in first."
+    }
+    return jsonify(response), 405
 
 def token_required(f):
     """
@@ -250,7 +259,7 @@ def token_required(f):
     def decorator(*args, **kwargs):
         token = request.cookies.get('jwt-token')
         if not token:
-            abort(403)
+            abort(405)
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             username = data['sub']
@@ -468,4 +477,5 @@ def deduct_wallet(username, token):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
+
