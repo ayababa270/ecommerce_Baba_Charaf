@@ -1,0 +1,9 @@
+Flask
+flask_sqlalchemy
+flask_marshmallow
+marshmallow
+PyMySQL
+SQLAlchemy
+requests
+PyJWT
+
