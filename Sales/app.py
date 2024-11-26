@@ -73,7 +73,10 @@ def display_goods():
         response = requests.get('http://inventory:5001/goods')
         goods = response.json()
         # Extract good name and price
-        goods_list = [{'name': good['name'], 'price_per_item': good['price_per_item']} for good in goods]
+        goods_list = [
+            {'name': good['name'], 'price_per_item': good['price_per_item']}
+            for good in goods if good.get('count_in_stock') >= 1
+        ]
         return jsonify(goods_list), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
