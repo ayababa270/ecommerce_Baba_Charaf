@@ -17,4 +17,3 @@ EXPOSE 5001
 
 # Command to run the application
 CMD ["python3", "app.py"]
-

@@ -59,6 +59,20 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+        
+  reviews:
+    build:
+      context: ./reviews
+    container_name: reviews_service
+    environment:
+      - SQLALCHEMY_DATABASE_URI=mysql+pymysql://root:rootpassword@mysql_container:3306/mydatabase
+    networks:
+      - my_network
+    ports:
+      - "5004:5001"
+    depends_on:
+      mysql:
+        condition: service_healthy
 
 networks:
   my_network:
