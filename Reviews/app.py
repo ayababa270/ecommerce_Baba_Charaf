@@ -55,6 +55,16 @@ def forbidden_error(error):
         "message": "No token provided. Please log in first."
     }
     return jsonify(response), 405
+    
+# Custom error handler for 406 errors
+@app.errorhandler(406)
+def forbidden_error(error):
+    response = {
+        "error": "Forbidden",
+        "message": "Requires Admin. Please log in first."
+    }
+    return jsonify(response), 406
+
 
 
 # Function to verify JWT token
@@ -79,7 +89,7 @@ def admin_required(f):
     @wraps(f)
     def decorator(username, *args, **kwargs):
         if username not in ADMIN_USERS:
-            return jsonify({'error': 'Admin privileges required'}), 403
+            abort(406)
         return f(username, *args, **kwargs)
     return decorator
 
