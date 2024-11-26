@@ -46,13 +46,24 @@ class ReviewSchema(ma.Schema):
 review_schema = ReviewSchema()
 reviews_schema = ReviewSchema(many=True)
 
+
+# Custom error handler for 405 errors
+@app.errorhandler(405)
+def forbidden_error(error):
+    response = {
+        "error": "Forbidden",
+        "message": "No token provided. Please log in first."
+    }
+    return jsonify(response), 405
+
+
 # Function to verify JWT token
 def token_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         token = request.cookies.get('jwt-token') or request.headers.get('Authorization')
         if not token:
-            return jsonify({'error': 'Authentication token required'}), 403
+            abort(405)
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             username = data['sub']
@@ -90,7 +101,7 @@ def submit_review(customer_username):
 
     # Check if product exists
     try:
-        response = requests.get(f'http://inventory:5000/goods/{product_name}')
+        response = requests.get(f'http://inventory:5001/goods/{product_name}')
         if response.status_code == 404:
             return jsonify({'error': 'Product not found'}), 404
     except Exception as e:
@@ -105,6 +116,10 @@ def submit_review(customer_username):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+
+
 
 # Endpoint 2: Update Review
 @app.route('/reviews/<int:review_id>', methods=['PUT'])
@@ -206,4 +221,4 @@ def get_review_details(review_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)
