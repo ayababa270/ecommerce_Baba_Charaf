@@ -70,7 +70,7 @@ def token_required(f):
 def display_goods():
     # Call inventory service to get list of goods
     try:
-        response = requests.get('http://inventory:5000/goods')
+        response = requests.get('http://inventory:5001/goods')
         goods = response.json()
         # Extract good name and price
         goods_list = [{'name': good['name'], 'price_per_item': good['price_per_item']} for good in goods]
@@ -84,7 +84,7 @@ def display_goods():
 def get_good_details(good_name):
     # Call inventory service to get good details
     try:
-        response = requests.get(f'http://inventory:5000/goods/{good_name}')
+        response = requests.get(f'http://inventory:5001/goods/{good_name}')
         if response.status_code == 404:
             return jsonify({'error': 'Good not found'}), 404
         good = response.json()
@@ -97,7 +97,7 @@ def get_good_details(good_name):
 @token_required
 def make_sale(customer_username):
     data = request.json
-    good_name = data.get('good_name')
+    good_name = data.get('name')
 
     if not good_name:
         return jsonify({'error': 'Missing required fields'}), 400
@@ -106,7 +106,7 @@ def make_sale(customer_username):
 
     try:
         # Check if good is available
-        response = requests.get(f'http://inventory:5000/goods/{good_name}')
+        response = requests.get(f'http://inventory:5001/goods/{good_name}')
         if response.status_code == 404:
             return jsonify({'error': 'Good not found'}), 404
         good = response.json()
@@ -114,7 +114,7 @@ def make_sale(customer_username):
             return jsonify({'error': 'Good is out of stock'}), 400
 
         # Check if customer has enough money
-        response = requests.get(f'http://customers:5000/get_customer_by_username/{customer_username}', cookies={'jwt-token': token})
+        response = requests.get(f'http://customers:5001/get_customer_by_username/{customer_username}', cookies={'jwt-token': token})
         if response.status_code == 404:
             return jsonify({'error': 'Customer not found'}), 404
         customer = response.json()
@@ -123,12 +123,12 @@ def make_sale(customer_username):
 
         # Deduct money from customer wallet
         deduct_data = {'amount': good['price_per_item']}
-        response = requests.post(f'http://customers:5000/deduct_wallet', json=deduct_data, cookies={'jwt-token': token})
+        response = requests.post(f'http://customers:5001/deduct_wallet', json=deduct_data, cookies={'jwt-token': token})
         if response.status_code != 200:
             return jsonify({'error': 'Failed to deduct money from wallet'}), response.status_code
 
         # Decrease count of the purchased good
-        response = requests.post(f'http://inventory:5000/decrease_stock/{good_name}')
+        response = requests.post(f'http://inventory:5001/decrease_stock/{good_name}')
         if response.status_code != 200:
             return jsonify({'error': 'Failed to update good stock'}), response.status_code
 
@@ -154,6 +154,6 @@ def get_purchase_history(customer_username):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)
 
 
