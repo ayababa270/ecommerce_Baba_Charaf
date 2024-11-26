@@ -48,13 +48,22 @@ class PurchaseSchema(ma.Schema):
 purchase_schema = PurchaseSchema()
 purchases_schema = PurchaseSchema(many=True)
 
+# Custom error handler for 405 errors
+@app.errorhandler(405)
+def forbidden_error(error):
+    response = {
+        "error": "Forbidden",
+        "message": "No token provided. Please log in first."
+    }
+    return jsonify(response), 405
+
 # Function to verify JWT token
 def token_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         token = request.cookies.get('jwt-token') or request.headers.get('Authorization')
         if not token:
-            return jsonify({'error': 'Authentication token required'}), 403
+            abort(405)
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             username = data['sub']
