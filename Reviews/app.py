@@ -83,7 +83,7 @@ def token_required(f):
     return decorator
 
 # Function to check if user is admin (for simplicity, let's assume admin usernames are stored in a list)
-ADMIN_USERS = ['admin']
+ADMIN_USERS = ['johndoe112']
 
 def admin_required(f):
     @wraps(f)
