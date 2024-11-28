@@ -11,6 +11,9 @@ inventory-test:
 sales-test:
 	pytest -q tests/test_sales.py
 	
+reviews-test:
+	pytest -q tests/test_reviews.py
+
 inventory:
 	flask --app inventory/app run --port 5001
 
