@@ -116,3 +116,59 @@ def test_update_good(client, good1):
     assert response.status_code == 400
 
 
+def test_get_all_goods(client, good2):
+    response = client.post(
+            '/add_good',
+            data=json.dumps(good2),
+            content_type='application/json',
+        )
+    assert response.status_code == 201
+
+    response = client.get('/goods')
+    assert response.status_code == 200
+
+    data = response.json
+    assert isinstance(data, list)
+    assert len(data) == 2  
+    assert data[0]["name"] == "Smartphone"
+    assert data[1]["name"] == "Apple"
+
+def test_get_good_by_name(client, good1):
+
+    response = client.get(f'/goods/{good1["name"]}')
+    assert response.status_code == 200
+
+    data = response.json
+    assert data["name"] == good1["name"]
+    assert data["category"] == good1["category"]
+    assert data["price_per_item"] == good1["price_per_item"]
+    assert data["description"] == good1["description"]
+    assert data["count_in_stock"] == good1["count_in_stock"]
+
+    # Fetch a non-existent good
+    response = client.get('/goods/non_existent_good')
+    assert response.status_code == 404
+    assert response.json["error"] == "Good not found"
+
+def test_decrease_stock(client, good1):
+    # Decrease stock successfully
+    response = client.post(f'/decrease_stock/{good1["name"]}')
+    assert response.status_code == 200
+
+    data = response.json
+    assert data["message"] == "Stock decreased"
+    assert data["new_count"] == good1["count_in_stock"] - 1
+
+    # Attempt to decrease stock for a non-existent good
+    response = client.post('/decrease_stock/non_existent_good')
+    assert response.status_code == 404
+    assert response.json["error"] == "Good not found"
+
+    # Attempt to decrease stock with no stock available
+    # Simulate stock depletion
+    for _ in range(good1["count_in_stock"]):
+        client.post(f'/decrease_stock/{good1["name"]}')
+    
+    response = client.post(f'/decrease_stock/{good1["name"]}')
+    assert response.status_code == 400
+    assert response.json["error"] == "No stock available"

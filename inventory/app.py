@@ -114,12 +114,14 @@ goods_list_schema = GoodsSchema(many=True)
 
 
 @app.route('/goods', methods=['GET'])
+@limiter.limit("50 per minute")
 def get_all_goods():
     goods = Goods.query.all()
     return jsonify(goods_list_schema.dump(goods)), 200
 
 
 @app.route('/goods/<string:good_name>', methods=['GET'])
+@limiter.limit("50 per minute")
 def get_good_by_name(good_name):
     good = Goods.query.filter_by(name=good_name).first()
     if not good:
@@ -128,6 +130,7 @@ def get_good_by_name(good_name):
 
 
 @app.route('/decrease_stock/<string:good_name>', methods=['POST'])
+@limiter.limit("50 per minute")
 def decrease_stock(good_name):
     good = Goods.query.filter_by(name=good_name).first()
     if not good:
