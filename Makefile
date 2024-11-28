@@ -6,7 +6,10 @@ customer-test:
 	pytest -q tests/test_customer.py 
 
 inventory-test: 
-	pytest -q tests/test_inventory.py 
+	pytest -q tests/test_inventory.py
+
+sales-test:
+	pytest -q tests/test_sales.py
 	
 inventory:
 	flask --app inventory/app run --port 5001
