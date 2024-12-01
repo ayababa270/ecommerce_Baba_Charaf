@@ -7,6 +7,8 @@ from datetime import datetime
 from functools import wraps
 import jwt
 from pybreaker import CircuitBreaker, CircuitBreakerError
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 
@@ -16,6 +18,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
     'mysql+pymysql://root:rootpassword@localhost:3307/mydatabase'  # Default for local testing
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+limiter = Limiter(
+    get_remote_address,  # Uses client's IP address for rate-limiting
+    app=app,
+    default_limits=["200 per day", "50 per hour"],  # Global rate limits
+)
 
 # Secret key for JWT (should match with customer service)
 SECRET_KEY = "b'|\xe7\xbfU3`\xc4\xec\xa7\xa9zf:}\xb5\xc7\xb9\x139^3@Dv'"
@@ -134,6 +142,7 @@ customers_circuit_breaker = CircuitBreaker(
 
 # Endpoint 1: Display available goods
 @app.route('/goods', methods=['GET'])
+@limiter.limit("100 per minute")
 def display_goods():
     """
     Retrieve and display a list of available goods.
@@ -160,6 +169,7 @@ def display_goods():
 
 # Endpoint 2: Get goods details
 @app.route('/goods/<string:good_name>', methods=['GET'])
+@limiter.limit("100 per minute")
 def get_good_details(good_name):
     """
     Retrieve detailed information about a specific good.
@@ -187,6 +197,7 @@ def get_good_details(good_name):
 # Endpoint 3: Sale
 @app.route('/sale', methods=['POST'])
 @token_required
+@limiter.limit("100 per minute")
 def make_sale(customer_username):
     """
     Process a sale transaction for a customer.
@@ -284,6 +295,7 @@ def make_sale(customer_username):
 
 # Endpoint 4: Get purchase history for a customer
 @app.route('/purchase_history', methods=['GET'])
+@limiter.limit("100 per minute")
 @token_required
 def get_purchase_history(customer_username):
     """
