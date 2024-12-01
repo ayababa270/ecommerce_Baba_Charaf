@@ -24,6 +24,27 @@ ma = Marshmallow(app)
 
 # Review Model
 class Review(db.Model):
+    """
+    Represents a review left by a customer for a product.
+
+    :param id: Unique identifier for the review.
+    :type id: int
+    :param customer_username: Username of the customer who wrote the review.
+    :type customer_username: str
+    :param product_name: Name of the product being reviewed.
+    :type product_name: str
+    :param rating: Rating given to the product, between 1 and 5.
+    :type rating: int
+    :param comment: Optional comment provided by the customer.
+    :type comment: str
+    :param is_moderated: Indicates if the review has been moderated.
+    :type is_moderated: bool
+    :param is_approved: Indicates if the review has been approved.
+    :type is_approved: bool
+    :param timestamp: Date and time when the review was created.
+    :type timestamp: datetime
+    """
+
     id = db.Column(db.Integer, primary_key=True)
     customer_username = db.Column(db.String(50), nullable=False)
     product_name = db.Column(db.String(100), nullable=False)
@@ -34,41 +55,85 @@ class Review(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __init__(self, customer_username, product_name, rating, comment):
+        """
+        Initializes a Review instance.
+
+        :param customer_username: Username of the customer.
+        :type customer_username: str
+        :param product_name: Name of the product.
+        :type product_name: str
+        :param rating: Rating given to the product (1-5).
+        :type rating: int
+        :param comment: Optional comment.
+        :type comment: str
+        """
         self.customer_username = customer_username
         self.product_name = product_name
         self.rating = rating
         self.comment = comment
 
 class ReviewSchema(ma.Schema):
+    """
+    Schema for serializing and deserializing Review instances.
+
+    :cvar Meta: Meta information for the schema.
+    """
     class Meta:
+        """
+        Meta information for ReviewSchema.
+
+        :cvar fields: Fields to include in the serialized output.
+        :vartype fields: tuple
+        """
         fields = ("id", "customer_username", "product_name", "rating", "comment", "is_moderated", "is_approved", "timestamp")
 
 review_schema = ReviewSchema()
 reviews_schema = ReviewSchema(many=True)
 
-
 # Custom error handler for 405 errors
 @app.errorhandler(405)
 def forbidden_error(error):
+    """
+    Custom error handler for 405 Method Not Allowed errors.
+
+    :param error: The error object.
+    :type error: Exception
+    :return: JSON response with error details.
+    :rtype: flask.Response
+    """
     response = {
         "error": "Forbidden",
         "message": "No token provided. Please log in first."
     }
     return jsonify(response), 405
-    
+
 # Custom error handler for 406 errors
 @app.errorhandler(406)
-def forbidden_error(error):
+def admin_required_error(error):
+    """
+    Custom error handler for 406 Not Acceptable errors (Admin required).
+
+    :param error: The error object.
+    :type error: Exception
+    :return: JSON response with error details.
+    :rtype: flask.Response
+    """
     response = {
         "error": "Forbidden",
         "message": "Requires Admin. Please log in first."
     }
     return jsonify(response), 406
 
-
-
 # Function to verify JWT token
 def token_required(f):
+    """
+    Decorator to ensure that a valid JWT token is provided.
+
+    :param f: The decorated function.
+    :type f: function
+    :return: The wrapped function.
+    :rtype: function
+    """
     @wraps(f)
     def decorator(*args, **kwargs):
         token = request.cookies.get('jwt-token') or request.headers.get('Authorization')
@@ -86,6 +151,14 @@ def token_required(f):
 ADMIN_USERS = ['johndoe112']
 
 def admin_required(f):
+    """
+    Decorator to ensure that the user is an admin.
+
+    :param f: The decorated function.
+    :type f: function
+    :return: The wrapped function.
+    :rtype: function
+    """
     @wraps(f)
     def decorator(username, *args, **kwargs):
         if username not in ADMIN_USERS:
@@ -97,6 +170,16 @@ def admin_required(f):
 @app.route('/reviews', methods=['POST'])
 @token_required
 def submit_review(customer_username):
+    """
+    Submit a new review for a product.
+
+    This endpoint allows a logged-in customer to submit a review for a product they have purchased.
+
+    :param customer_username: Username of the customer submitting the review.
+    :type customer_username: str
+    :return: JSON response indicating success or failure.
+    :rtype: flask.Response
+    """
     data = request.json
     product_name = data.get('product_name')
     rating = data.get('rating')
@@ -127,14 +210,22 @@ def submit_review(customer_username):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-
-
-
-
 # Endpoint 2: Update Review
 @app.route('/reviews/<int:review_id>', methods=['PUT'])
 @token_required
 def update_review(customer_username, review_id):
+    """
+    Update an existing review.
+
+    Allows a customer to update their own review. Only the rating and comment can be updated.
+
+    :param customer_username: Username of the customer attempting the update.
+    :type customer_username: str
+    :param review_id: ID of the review to update.
+    :type review_id: int
+    :return: JSON response indicating success or failure.
+    :rtype: flask.Response
+    """
     data = request.json
     rating = data.get('rating')
     comment = data.get('comment')
@@ -168,6 +259,18 @@ def update_review(customer_username, review_id):
 @app.route('/reviews/<int:review_id>', methods=['DELETE'])
 @token_required
 def delete_review(customer_username, review_id):
+    """
+    Delete a review.
+
+    Allows a customer to delete their own review or an admin to delete any review.
+
+    :param customer_username: Username of the customer attempting the deletion.
+    :type customer_username: str
+    :param review_id: ID of the review to delete.
+    :type review_id: int
+    :return: JSON response indicating success or failure.
+    :rtype: flask.Response
+    """
     review = Review.query.get(review_id)
     if not review:
         return jsonify({'error': 'Review not found'}), 404
@@ -186,12 +289,32 @@ def delete_review(customer_username, review_id):
 # Endpoint 4: Get Product Reviews
 @app.route('/reviews/product/<string:product_name>', methods=['GET'])
 def get_product_reviews(product_name):
+    """
+    Get all approved reviews for a product.
+
+    Retrieves all reviews for a specific product that have been approved by an admin.
+
+    :param product_name: Name of the product.
+    :type product_name: str
+    :return: JSON list of reviews.
+    :rtype: flask.Response
+    """
     reviews = Review.query.filter_by(product_name=product_name, is_approved=True).all()
     return jsonify(reviews_schema.dump(reviews)), 200
 
 # Endpoint 5: Get Customer Reviews
 @app.route('/reviews/customer/<string:customer_username>', methods=['GET'])
 def get_customer_reviews(customer_username):
+    """
+    Get all reviews written by a customer.
+
+    Retrieves all reviews submitted by a specific customer.
+
+    :param customer_username: Username of the customer.
+    :type customer_username: str
+    :return: JSON list of reviews.
+    :rtype: flask.Response
+    """
     reviews = Review.query.filter_by(customer_username=customer_username).all()
     return jsonify(reviews_schema.dump(reviews)), 200
 
@@ -200,6 +323,18 @@ def get_customer_reviews(customer_username):
 @token_required
 @admin_required
 def moderate_review(admin_username, review_id):
+    """
+    Moderate a review (admin only).
+
+    Allows an admin to approve or reject a review.
+
+    :param admin_username: Username of the admin performing moderation.
+    :type admin_username: str
+    :param review_id: ID of the review to moderate.
+    :type review_id: int
+    :return: JSON response indicating success or failure.
+    :rtype: flask.Response
+    """
     data = request.json
     is_approved = data.get('is_approved')
 
@@ -223,6 +358,16 @@ def moderate_review(admin_username, review_id):
 # Endpoint 7: Get Review Details
 @app.route('/reviews/<int:review_id>', methods=['GET'])
 def get_review_details(review_id):
+    """
+    Get details of a specific review.
+
+    Retrieves all information about a specific review, regardless of its approval status.
+
+    :param review_id: ID of the review.
+    :type review_id: int
+    :return: JSON object with review details.
+    :rtype: flask.Response
+    """
     review = Review.query.get(review_id)
     if not review:
         return jsonify({'error': 'Review not found'}), 404

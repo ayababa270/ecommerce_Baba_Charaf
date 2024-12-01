@@ -1,5 +1,5 @@
 from flask import json
-from ..Sales.app import app, db, SECRET_KEY, Purchase
+from ..sales.app import app, db, SECRET_KEY, Purchase
 import pytest
 import jwt
 import datetime

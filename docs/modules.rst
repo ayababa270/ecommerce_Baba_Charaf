@@ -6,3 +6,5 @@ ecommerce_Baba_Charaf
 
    customer
    inventory
+   sales
+   reviews

@@ -6,7 +6,7 @@ from flask import json
 import jwt
 import datetime
 
-from ..Reviews.app import app, db, SECRET_KEY, Review
+from ..reviews.app import app, db, SECRET_KEY, Review
 
 @pytest.fixture
 def client():
