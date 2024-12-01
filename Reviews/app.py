@@ -6,6 +6,7 @@ import requests
 from datetime import datetime
 from functools import wraps
 import jwt
+from pybreaker import CircuitBreaker, CircuitBreakerError
 
 app = Flask(__name__)
 
@@ -166,6 +167,33 @@ def admin_required(f):
         return f(username, *args, **kwargs)
     return decorator
 
+# Initialize Circuit Breaker for the Inventory Service
+inventory_circuit_breaker = CircuitBreaker(
+    fail_max=5,          # Number of consecutive failures before opening the circuit
+    reset_timeout=60,    # Time in seconds before attempting to reset the circuit
+    name='inventory_service'  # Optional: Name for the circuit breaker
+)
+
+# Optional: Add Logging Listener for Circuit Breaker State Changes
+import logging
+from pybreaker import CircuitBreakerListener, CircuitBreakerState
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class LoggingListener(CircuitBreakerListener):
+    def state_change(self, cb, old_state, new_state):
+        logger.info(f'Circuit breaker "{cb.name}" state changed from {old_state} to {new_state}')
+
+# Re-initialize Circuit Breaker with Listener
+inventory_circuit_breaker = CircuitBreaker(
+    fail_max=5,
+    reset_timeout=60,
+    name='inventory_service',
+    listeners=[LoggingListener()]
+)
+
 # Endpoint 1: Submit Review
 @app.route('/reviews', methods=['POST'])
 @token_required
@@ -194,9 +222,11 @@ def submit_review(customer_username):
 
     # Check if product exists
     try:
-        response = requests.get(f'http://inventory:5001/goods/{product_name}')
+        response = inventory_circuit_breaker.call(requests.get, f'http://inventory:5001/goods/{product_name}')
         if response.status_code == 404:
             return jsonify({'error': 'Product not found'}), 404
+    except CircuitBreakerError:
+        return jsonify({'error': 'Inventory service temporarily unavailable'}), 503
     except Exception as e:
         return jsonify({'error': 'Failed to verify product'}), 500
 

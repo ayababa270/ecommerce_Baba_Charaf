@@ -6,6 +6,7 @@ import requests
 from datetime import datetime
 from functools import wraps
 import jwt
+from pybreaker import CircuitBreaker, CircuitBreakerError
 
 app = Flask(__name__)
 
@@ -118,6 +119,19 @@ def token_required(f):
         return f(username, *args, **kwargs)
     return decorator
 
+# Initialize Circuit Breakers for external services
+inventory_circuit_breaker = CircuitBreaker(
+    fail_max=5,          # Number of consecutive failures before opening the circuit
+    reset_timeout=60,    # Time in seconds before attempting to reset the circuit
+    name='inventory_service'  # Optional: Name for the circuit breaker
+)
+
+customers_circuit_breaker = CircuitBreaker(
+    fail_max=5,
+    reset_timeout=60,
+    name='customers_service'
+)
+
 # Endpoint 1: Display available goods
 @app.route('/goods', methods=['GET'])
 def display_goods():
@@ -131,7 +145,7 @@ def display_goods():
     :raises 500: If there is an error communicating with the inventory service.
     """
     try:
-        response = requests.get('http://inventory:5001/goods')
+        response = inventory_circuit_breaker.call(requests.get, 'http://inventory:5001/goods')
         goods = response.json()
         # Extract good name and price
         goods_list = [
@@ -139,6 +153,8 @@ def display_goods():
             for good in goods if good.get('count_in_stock') >= 1
         ]
         return jsonify(goods_list), 200
+    except CircuitBreakerError:
+        return jsonify({'error': 'Inventory service temporarily unavailable'}), 503
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -158,11 +174,13 @@ def get_good_details(good_name):
     :raises 500: If there is an error communicating with the inventory service.
     """
     try:
-        response = requests.get(f'http://inventory:5001/goods/{good_name}')
+        response = inventory_circuit_breaker.call(requests.get, f'http://inventory:5001/goods/{good_name}')
         if response.status_code == 404:
             return jsonify({'error': 'Good not found'}), 404
         good = response.json()
         return jsonify(good), 200
+    except CircuitBreakerError:
+        return jsonify({'error': 'Inventory service temporarily unavailable'}), 503
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -186,6 +204,7 @@ def make_sale(customer_username):
     :rtype: flask.Response
     :raises 400: If required fields are missing or if funds are insufficient.
     :raises 404: If the good or customer is not found.
+    :raises 503: If external services are temporarily unavailable.
     :raises 500: If there is an internal server error during the transaction.
     """
     data = request.json
@@ -198,7 +217,11 @@ def make_sale(customer_username):
 
     try:
         # Check if good is available
-        response = requests.get(f'http://inventory:5001/goods/{good_name}')
+        try:
+            response = inventory_circuit_breaker.call(requests.get, f'http://inventory:5001/goods/{good_name}')
+        except CircuitBreakerError:
+            return jsonify({'error': 'Inventory service temporarily unavailable'}), 503
+
         if response.status_code == 404:
             return jsonify({'error': 'Good not found'}), 404
         good = response.json()
@@ -206,7 +229,15 @@ def make_sale(customer_username):
             return jsonify({'error': 'Good is out of stock'}), 400
 
         # Check if customer has enough money
-        response = requests.get(f'http://customers:5001/get_customer_by_username/{customer_username}', cookies={'jwt-token': token})
+        try:
+            response = customers_circuit_breaker.call(
+                requests.get,
+                f'http://customers:5001/get_customer_by_username/{customer_username}',
+                cookies={'jwt-token': token}
+            )
+        except CircuitBreakerError:
+            return jsonify({'error': 'Customer service temporarily unavailable'}), 503
+
         if response.status_code == 404:
             return jsonify({'error': 'Customer not found'}), 404
         customer = response.json()
@@ -215,12 +246,28 @@ def make_sale(customer_username):
 
         # Deduct money from customer wallet
         deduct_data = {'amount': good['price_per_item']}
-        response = requests.post(f'http://customers:5001/deduct_wallet', json=deduct_data, cookies={'jwt-token': token})
+        try:
+            response = customers_circuit_breaker.call(
+                requests.post,
+                f'http://customers:5001/deduct_wallet',
+                json=deduct_data,
+                cookies={'jwt-token': token}
+            )
+        except CircuitBreakerError:
+            return jsonify({'error': 'Customer service temporarily unavailable'}), 503
+
         if response.status_code != 200:
             return jsonify({'error': 'Failed to deduct money from wallet'}), response.status_code
 
         # Decrease count of the purchased good
-        response = requests.post(f'http://inventory:5001/decrease_stock/{good_name}')
+        try:
+            response = inventory_circuit_breaker.call(
+                requests.post,
+                f'http://inventory:5001/decrease_stock/{good_name}'
+            )
+        except CircuitBreakerError:
+            return jsonify({'error': 'Inventory service temporarily unavailable'}), 503
+
         if response.status_code != 200:
             return jsonify({'error': 'Failed to update good stock'}), response.status_code
 
