@@ -1,0 +1,454 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reviews module &mdash; ecommerce_Baba_Charaf 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="sales module" href="sales.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ecommerce_Baba_Charaf
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">ecommerce_Baba_Charaf</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="customer.html">customer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inventory.html">inventory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html">sales module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">reviews module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.Review"><code class="docutils literal notranslate"><span class="pre">Review</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.comment"><code class="docutils literal notranslate"><span class="pre">Review.comment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.customer_username"><code class="docutils literal notranslate"><span class="pre">Review.customer_username</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.id"><code class="docutils literal notranslate"><span class="pre">Review.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.is_approved"><code class="docutils literal notranslate"><span class="pre">Review.is_approved</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.is_moderated"><code class="docutils literal notranslate"><span class="pre">Review.is_moderated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.product_name"><code class="docutils literal notranslate"><span class="pre">Review.product_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.query"><code class="docutils literal notranslate"><span class="pre">Review.query</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.rating"><code class="docutils literal notranslate"><span class="pre">Review.rating</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.Review.timestamp"><code class="docutils literal notranslate"><span class="pre">Review.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.ReviewSchema"><code class="docutils literal notranslate"><span class="pre">ReviewSchema</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.ReviewSchema.Meta"><code class="docutils literal notranslate"><span class="pre">ReviewSchema.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reviews.app.ReviewSchema.opts"><code class="docutils literal notranslate"><span class="pre">ReviewSchema.opts</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.admin_required"><code class="docutils literal notranslate"><span class="pre">admin_required()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.admin_required_error"><code class="docutils literal notranslate"><span class="pre">admin_required_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.delete_review"><code class="docutils literal notranslate"><span class="pre">delete_review()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.forbidden_error"><code class="docutils literal notranslate"><span class="pre">forbidden_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.get_customer_reviews"><code class="docutils literal notranslate"><span class="pre">get_customer_reviews()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.get_product_reviews"><code class="docutils literal notranslate"><span class="pre">get_product_reviews()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.get_review_details"><code class="docutils literal notranslate"><span class="pre">get_review_details()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.moderate_review"><code class="docutils literal notranslate"><span class="pre">moderate_review()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.submit_review"><code class="docutils literal notranslate"><span class="pre">submit_review()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.token_required"><code class="docutils literal notranslate"><span class="pre">token_required()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reviews.app.update_review"><code class="docutils literal notranslate"><span class="pre">update_review()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ecommerce_Baba_Charaf</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">ecommerce_Baba_Charaf</a></li>
+      <li class="breadcrumb-item active">reviews module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/reviews.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-reviews.app">
+<span id="reviews-module"></span><h1>reviews module<a class="headerlink" href="#module-reviews.app" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="reviews.app.Review">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">Review</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">customer_username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#Review"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.Review" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Represents a review left by a customer for a product.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) – Unique identifier for the review.</p></li>
+<li><p><strong>customer_username</strong> (<em>str</em>) – Username of the customer who wrote the review.</p></li>
+<li><p><strong>product_name</strong> (<em>str</em>) – Name of the product being reviewed.</p></li>
+<li><p><strong>rating</strong> (<em>int</em>) – Rating given to the product, between 1 and 5.</p></li>
+<li><p><strong>comment</strong> (<em>str</em>) – Optional comment provided by the customer.</p></li>
+<li><p><strong>is_moderated</strong> (<em>bool</em>) – Indicates if the review has been moderated.</p></li>
+<li><p><strong>is_approved</strong> (<em>bool</em>) – Indicates if the review has been approved.</p></li>
+<li><p><strong>timestamp</strong> (<em>datetime</em>) – Date and time when the review was created.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.comment">
+<span class="sig-name descname"><span class="pre">comment</span></span><a class="headerlink" href="#reviews.app.Review.comment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.customer_username">
+<span class="sig-name descname"><span class="pre">customer_username</span></span><a class="headerlink" href="#reviews.app.Review.customer_username" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#reviews.app.Review.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.is_approved">
+<span class="sig-name descname"><span class="pre">is_approved</span></span><a class="headerlink" href="#reviews.app.Review.is_approved" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.is_moderated">
+<span class="sig-name descname"><span class="pre">is_moderated</span></span><a class="headerlink" href="#reviews.app.Review.is_moderated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.product_name">
+<span class="sig-name descname"><span class="pre">product_name</span></span><a class="headerlink" href="#reviews.app.Review.product_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.query">
+<span class="sig-name descname"><span class="pre">query</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">t.ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Query</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#reviews.app.Review.query" title="Link to this definition"></a></dt>
+<dd><p>A SQLAlchemy query for a model. Equivalent to <code class="docutils literal notranslate"><span class="pre">db.session.query(Model)</span></code>. Can be
+customized per-model by overriding <code class="xref py py-attr docutils literal notranslate"><span class="pre">query_class</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The query interface is considered legacy in SQLAlchemy. Prefer using
+<code class="docutils literal notranslate"><span class="pre">session.execute(select())</span></code> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.rating">
+<span class="sig-name descname"><span class="pre">rating</span></span><a class="headerlink" href="#reviews.app.Review.rating" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.Review.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><a class="headerlink" href="#reviews.app.Review.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="reviews.app.ReviewSchema">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">ReviewSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AbstractSet</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AbstractSet</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">many</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AbstractSet</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dump_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AbstractSet</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AbstractSet</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unknown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#ReviewSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.ReviewSchema" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Schema</span></code></p>
+<p>Schema for serializing and deserializing Review instances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Meta</strong> – Meta information for the schema.</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="reviews.app.ReviewSchema.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/reviews/app.html#ReviewSchema.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.ReviewSchema.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta information for ReviewSchema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fields</strong> (<em>tuple</em>) – Fields to include in the serialized output.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.ReviewSchema.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'customer_username',</span> <span class="pre">'product_name',</span> <span class="pre">'rating',</span> <span class="pre">'comment',</span> <span class="pre">'is_moderated',</span> <span class="pre">'is_approved',</span> <span class="pre">'timestamp')</span></em><a class="headerlink" href="#reviews.app.ReviewSchema.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="reviews.app.ReviewSchema.opts">
+<span class="sig-name descname"><span class="pre">opts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SchemaOpts</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;marshmallow.schema.SchemaOpts</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#reviews.app.ReviewSchema.opts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.admin_required">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">admin_required</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#admin_required"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.admin_required" title="Link to this definition"></a></dt>
+<dd><p>Decorator to ensure that the user is an admin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<em>function</em>) – The decorated function.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The wrapped function.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.admin_required_error">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">admin_required_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#admin_required_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.admin_required_error" title="Link to this definition"></a></dt>
+<dd><p>Custom error handler for 406 Not Acceptable errors (Admin required).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> (<em>Exception</em>) – The error object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON response with error details.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.delete_review">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">delete_review</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">customer_username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#delete_review"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.delete_review" title="Link to this definition"></a></dt>
+<dd><p>Delete a review.</p>
+<p>Allows a customer to delete their own review or an admin to delete any review.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>customer_username</strong> (<em>str</em>) – Username of the customer attempting the deletion.</p></li>
+<li><p><strong>review_id</strong> (<em>int</em>) – ID of the review to delete.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON response indicating success or failure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.forbidden_error">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">forbidden_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#forbidden_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.forbidden_error" title="Link to this definition"></a></dt>
+<dd><p>Custom error handler for 405 Method Not Allowed errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> (<em>Exception</em>) – The error object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON response with error details.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.get_customer_reviews">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">get_customer_reviews</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">customer_username</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#get_customer_reviews"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.get_customer_reviews" title="Link to this definition"></a></dt>
+<dd><p>Get all reviews written by a customer.</p>
+<p>Retrieves all reviews submitted by a specific customer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>customer_username</strong> (<em>str</em>) – Username of the customer.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON list of reviews.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.get_product_reviews">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">get_product_reviews</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">product_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#get_product_reviews"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.get_product_reviews" title="Link to this definition"></a></dt>
+<dd><p>Get all approved reviews for a product.</p>
+<p>Retrieves all reviews for a specific product that have been approved by an admin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>product_name</strong> (<em>str</em>) – Name of the product.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON list of reviews.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.get_review_details">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">get_review_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">review_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#get_review_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.get_review_details" title="Link to this definition"></a></dt>
+<dd><p>Get details of a specific review.</p>
+<p>Retrieves all information about a specific review, regardless of its approval status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>review_id</strong> (<em>int</em>) – ID of the review.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON object with review details.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.moderate_review">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">moderate_review</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">admin_username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#moderate_review"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.moderate_review" title="Link to this definition"></a></dt>
+<dd><p>Moderate a review (admin only).</p>
+<p>Allows an admin to approve or reject a review.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>admin_username</strong> (<em>str</em>) – Username of the admin performing moderation.</p></li>
+<li><p><strong>review_id</strong> (<em>int</em>) – ID of the review to moderate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON response indicating success or failure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.submit_review">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">submit_review</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">customer_username</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#submit_review"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.submit_review" title="Link to this definition"></a></dt>
+<dd><p>Submit a new review for a product.</p>
+<p>This endpoint allows a logged-in customer to submit a review for a product they have purchased.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>customer_username</strong> (<em>str</em>) – Username of the customer submitting the review.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON response indicating success or failure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.token_required">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">token_required</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#token_required"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.token_required" title="Link to this definition"></a></dt>
+<dd><p>Decorator to ensure that a valid JWT token is provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<em>function</em>) – The decorated function.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The wrapped function.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reviews.app.update_review">
+<span class="sig-prename descclassname"><span class="pre">reviews.app.</span></span><span class="sig-name descname"><span class="pre">update_review</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">customer_username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reviews/app.html#update_review"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reviews.app.update_review" title="Link to this definition"></a></dt>
+<dd><p>Update an existing review.</p>
+<p>Allows a customer to update their own review. Only the rating and comment can be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>customer_username</strong> (<em>str</em>) – Username of the customer attempting the update.</p></li>
+<li><p><strong>review_id</strong> (<em>int</em>) – ID of the review to update.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON response indicating success or failure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sales.html" class="btn btn-neutral float-left" title="sales module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, AYA BABA, AYMAN CHARAF.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

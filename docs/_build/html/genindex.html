@@ -83,6 +83,8 @@
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
@@ -94,9 +96,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="inventory.html#inventory.app.add_good">add_good() (in module inventory.app)</a>
 </li>
+      <li><a href="customer.html#customers.app.Customer.address">address (customers.app.Customer attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="customer.html#customers.app.Customer.address">address (customers.app.Customer attribute)</a>
+      <li><a href="reviews.html#reviews.app.admin_required">admin_required() (in module reviews.app)</a>
+</li>
+      <li><a href="reviews.html#reviews.app.admin_required_error">admin_required_error() (in module reviews.app)</a>
 </li>
       <li><a href="customer.html#customers.app.Customer.age">age (customers.app.Customer attribute)</a>
 </li>
@@ -110,6 +116,8 @@
 </li>
       <li><a href="customer.html#customers.app.charge_wallet">charge_wallet() (in module customers.app)</a>
 </li>
+      <li><a href="reviews.html#reviews.app.Review.comment">comment (reviews.app.Review attribute)</a>
+</li>
       <li><a href="inventory.html#inventory.app.Goods.count_in_stock">count_in_stock (inventory.app.Goods attribute)</a>
 </li>
       <li><a href="customer.html#customers.app.create_customer">create_customer() (in module customers.app)</a>
@@ -120,6 +128,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="customer.html#customers.app.Customer">Customer (class in customers.app)</a>
 </li>
+      <li><a href="reviews.html#reviews.app.Review.customer_username">customer_username (reviews.app.Review attribute)</a>
+
+      <ul>
+        <li><a href="sales.html#sales.app.Purchase.customer_username">(sales.app.Purchase attribute)</a>
+</li>
+      </ul></li>
       <li>
     customers.app
 
@@ -137,6 +151,8 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="inventory.html#inventory.app.decrease_stock">decrease_stock() (in module inventory.app)</a>
+</li>
       <li><a href="customer.html#customers.app.deduct_wallet">deduct_wallet() (in module customers.app)</a>
 </li>
       <li><a href="customer.html#customers.app.delete_customer">delete_customer() (in module customers.app)</a>
@@ -145,7 +161,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="inventory.html#inventory.app.delete_good">delete_good() (in module inventory.app)</a>
 </li>
+      <li><a href="reviews.html#reviews.app.delete_review">delete_review() (in module reviews.app)</a>
+</li>
       <li><a href="inventory.html#inventory.app.Goods.description">description (inventory.app.Goods attribute)</a>
+</li>
+      <li><a href="sales.html#sales.app.display_goods">display_goods() (in module sales.app)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -158,11 +178,23 @@
       <ul>
         <li><a href="inventory.html#inventory.app.GoodsSchema.Meta.fields">(inventory.app.GoodsSchema.Meta attribute)</a>
 </li>
+        <li><a href="reviews.html#reviews.app.ReviewSchema.Meta.fields">(reviews.app.ReviewSchema.Meta attribute)</a>
+</li>
+        <li><a href="sales.html#sales.app.PurchaseSchema.Meta.fields">(sales.app.PurchaseSchema.Meta attribute)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="customer.html#customers.app.Customer.first_name">first_name (customers.app.Customer attribute)</a>
 </li>
+      <li><a href="customer.html#customers.app.forbidden_error">forbidden_error() (in module customers.app)</a>
+
+      <ul>
+        <li><a href="reviews.html#reviews.app.forbidden_error">(in module reviews.app)</a>
+</li>
+        <li><a href="sales.html#sales.app.forbidden_error">(in module sales.app)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -173,10 +205,26 @@
 </li>
       <li><a href="customer.html#customers.app.get_all_customers">get_all_customers() (in module customers.app)</a>
 </li>
+      <li><a href="inventory.html#inventory.app.get_all_goods">get_all_goods() (in module inventory.app)</a>
+</li>
       <li><a href="customer.html#customers.app.get_customer_by_username">get_customer_by_username() (in module customers.app)</a>
+</li>
+      <li><a href="reviews.html#reviews.app.get_customer_reviews">get_customer_reviews() (in module reviews.app)</a>
+</li>
+      <li><a href="inventory.html#inventory.app.get_good_by_name">get_good_by_name() (in module inventory.app)</a>
+</li>
+      <li><a href="sales.html#sales.app.get_good_details">get_good_details() (in module sales.app)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reviews.html#reviews.app.get_product_reviews">get_product_reviews() (in module reviews.app)</a>
+</li>
+      <li><a href="sales.html#sales.app.get_purchase_history">get_purchase_history() (in module sales.app)</a>
+</li>
+      <li><a href="reviews.html#reviews.app.get_review_details">get_review_details() (in module reviews.app)</a>
+</li>
+      <li><a href="sales.html#sales.app.Purchase.good_name">good_name (sales.app.Purchase attribute)</a>
+</li>
       <li><a href="inventory.html#inventory.app.Goods">Goods (class in inventory.app)</a>
 </li>
       <li><a href="inventory.html#inventory.app.GoodsSchema">GoodsSchema (class in inventory.app)</a>
@@ -194,6 +242,10 @@
       <ul>
         <li><a href="inventory.html#inventory.app.Goods.id">(inventory.app.Goods attribute)</a>
 </li>
+        <li><a href="reviews.html#reviews.app.Review.id">(reviews.app.Review attribute)</a>
+</li>
+        <li><a href="sales.html#sales.app.Purchase.id">(sales.app.Purchase attribute)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -204,6 +256,10 @@
         <li><a href="inventory.html#module-inventory.app">module</a>
 </li>
       </ul></li>
+      <li><a href="reviews.html#reviews.app.Review.is_approved">is_approved (reviews.app.Review attribute)</a>
+</li>
+      <li><a href="reviews.html#reviews.app.Review.is_moderated">is_moderated (reviews.app.Review attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -222,6 +278,8 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sales.html#sales.app.make_sale">make_sale() (in module sales.app)</a>
+</li>
       <li><a href="customer.html#customers.app.Customer.marital_status">marital_status (customers.app.Customer attribute)</a>
 </li>
       <li><a href="customer.html#customers.app.CustomerSchema.Meta.model">model (customers.app.CustomerSchema.Meta attribute)</a>
@@ -230,6 +288,8 @@
         <li><a href="inventory.html#inventory.app.GoodsSchema.Meta.model">(inventory.app.GoodsSchema.Meta attribute)</a>
 </li>
       </ul></li>
+      <li><a href="reviews.html#reviews.app.moderate_review">moderate_review() (in module reviews.app)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
@@ -239,6 +299,10 @@
         <li><a href="customer.html#module-customers.app">customers.app</a>
 </li>
         <li><a href="inventory.html#module-inventory.app">inventory.app</a>
+</li>
+        <li><a href="reviews.html#module-reviews.app">reviews.app</a>
+</li>
+        <li><a href="sales.html#module-sales.app">sales.app</a>
 </li>
       </ul></li>
   </ul></td>
@@ -260,6 +324,10 @@
       <ul>
         <li><a href="inventory.html#inventory.app.GoodsSchema.opts">(inventory.app.GoodsSchema attribute)</a>
 </li>
+        <li><a href="reviews.html#reviews.app.ReviewSchema.opts">(reviews.app.ReviewSchema attribute)</a>
+</li>
+        <li><a href="sales.html#sales.app.PurchaseSchema.opts">(sales.app.PurchaseSchema attribute)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -269,9 +337,21 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="customer.html#customers.app.Customer.password">password (customers.app.Customer attribute)</a>
 </li>
+      <li><a href="sales.html#sales.app.Purchase.price">price (sales.app.Purchase attribute)</a>
+</li>
+      <li><a href="inventory.html#inventory.app.Goods.price_per_item">price_per_item (inventory.app.Goods attribute)</a>
+</li>
+      <li><a href="reviews.html#reviews.app.Review.product_name">product_name (reviews.app.Review attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="inventory.html#inventory.app.Goods.price_per_item">price_per_item (inventory.app.Goods attribute)</a>
+      <li><a href="sales.html#sales.app.Purchase">Purchase (class in sales.app)</a>
+</li>
+      <li><a href="sales.html#sales.app.Purchase.purchase_date">purchase_date (sales.app.Purchase attribute)</a>
+</li>
+      <li><a href="sales.html#sales.app.PurchaseSchema">PurchaseSchema (class in sales.app)</a>
+</li>
+      <li><a href="sales.html#sales.app.PurchaseSchema.Meta">PurchaseSchema.Meta (class in sales.app)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -284,15 +364,67 @@
       <ul>
         <li><a href="inventory.html#inventory.app.Goods.query">(inventory.app.Goods attribute)</a>
 </li>
+        <li><a href="reviews.html#reviews.app.Review.query">(reviews.app.Review attribute)</a>
+</li>
+        <li><a href="sales.html#sales.app.Purchase.query">(sales.app.Purchase attribute)</a>
+</li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reviews.html#reviews.app.Review.rating">rating (reviews.app.Review attribute)</a>
+</li>
+      <li><a href="reviews.html#reviews.app.Review">Review (class in reviews.app)</a>
+</li>
+      <li>
+    reviews.app
+
+      <ul>
+        <li><a href="reviews.html#module-reviews.app">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reviews.html#reviews.app.ReviewSchema">ReviewSchema (class in reviews.app)</a>
+</li>
+      <li><a href="reviews.html#reviews.app.ReviewSchema.Meta">ReviewSchema.Meta (class in reviews.app)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    sales.app
+
+      <ul>
+        <li><a href="sales.html#module-sales.app">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reviews.html#reviews.app.submit_review">submit_review() (in module reviews.app)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="customer.html#customers.app.token_required">token_required() (in module customers.app)</a>
+      <li><a href="reviews.html#reviews.app.Review.timestamp">timestamp (reviews.app.Review attribute)</a>
 </li>
+      <li><a href="customer.html#customers.app.token_required">token_required() (in module customers.app)</a>
+
+      <ul>
+        <li><a href="reviews.html#reviews.app.token_required">(in module reviews.app)</a>
+</li>
+        <li><a href="sales.html#sales.app.token_required">(in module sales.app)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -301,9 +433,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="customer.html#customers.app.update_customer_information">update_customer_information() (in module customers.app)</a>
 </li>
+      <li><a href="inventory.html#inventory.app.update_good_information">update_good_information() (in module inventory.app)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="inventory.html#inventory.app.update_good_information">update_good_information() (in module inventory.app)</a>
+      <li><a href="reviews.html#reviews.app.update_review">update_review() (in module reviews.app)</a>
 </li>
       <li><a href="customer.html#customers.app.Customer.username">username (customers.app.Customer attribute)</a>
 </li>

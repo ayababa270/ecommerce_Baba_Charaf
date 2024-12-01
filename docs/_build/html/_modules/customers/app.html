@@ -78,11 +78,28 @@
 <span class="kn">import</span> <span class="nn">jwt</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">from</span> <span class="nn">marshmallow</span> <span class="kn">import</span> <span class="n">validates</span><span class="p">,</span> <span class="n">ValidationError</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="c1">#from werkzeug.middleware.profiler import ProfilerMiddleware</span>
+<span class="c1">#import memory_profiler as mp</span>
+<span class="kn">from</span> <span class="nn">flask_limiter</span> <span class="kn">import</span> <span class="n">Limiter</span>
+<span class="kn">from</span> <span class="nn">flask_limiter.util</span> <span class="kn">import</span> <span class="n">get_remote_address</span>
 
 <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
+<span class="c1"># Uncomment this to profile again</span>
+<span class="c1">#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir=&quot;./performance_profiler/customer&quot;, restrictions=(&#39;app.py&#39;,))</span>
+
+<span class="n">limiter</span> <span class="o">=</span> <span class="n">Limiter</span><span class="p">(</span>
+    <span class="n">get_remote_address</span><span class="p">,</span>  <span class="c1"># Uses client&#39;s IP address for rate-limiting</span>
+    <span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span>
+    <span class="n">default_limits</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;200 per day&quot;</span><span class="p">,</span> <span class="s2">&quot;50 per hour&quot;</span><span class="p">],</span>  <span class="c1"># Global rate limits</span>
+<span class="p">)</span>
+
 <span class="c1"># Set the URI for the database connection</span>
-<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mysql+pymysql://root:rootpassword@localhost:3307/mydatabase&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
+    <span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mysql+pymysql://root:rootpassword@localhost:3307/mydatabase&#39;</span>  <span class="c1"># Default for local testing</span>
+<span class="p">)</span>
 <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_TRACK_MODIFICATIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Disable modification tracking for performance</span>
 
 
@@ -238,6 +255,8 @@
 <div class="viewcode-block" id="create_customer">
 <a class="viewcode-back" href="../../customer.html#customers.app.create_customer">[docs]</a>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/create_customer&quot;</span><span class="p">,</span> <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;50 per minute&quot;</span><span class="p">)</span>
+<span class="c1">#@mp.profile</span>
 <span class="k">def</span> <span class="nf">create_customer</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a new customer from the information in the request body. Inserts it into the customer table.</span>
@@ -284,6 +303,8 @@
 <div class="viewcode-block" id="get_customer_by_username">
 <a class="viewcode-back" href="../../customer.html#customers.app.get_customer_by_username">[docs]</a>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/get_customer_by_username/&lt;username&gt;&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;50 per minute&quot;</span><span class="p">)</span>
+<span class="c1">#@mp.profile</span>
 <span class="k">def</span> <span class="nf">get_customer_by_username</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves a customer by their username.</span>
@@ -328,7 +349,19 @@
         <span class="n">payload</span><span class="p">,</span> 
         <span class="n">SECRET_KEY</span><span class="p">,</span> 
         <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;HS256&#39;</span> 
-    <span class="p">)</span> </div>
+    <span class="p">)</span></div>
+
+
+<span class="c1"># Custom error handler for 405 errors</span>
+<div class="viewcode-block" id="forbidden_error">
+<a class="viewcode-back" href="../../customer.html#customers.app.forbidden_error">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="mi">405</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">forbidden_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Forbidden&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;No token provided. Please log in first.&quot;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">response</span><span class="p">),</span> <span class="mi">405</span></div>
 
 
 <div class="viewcode-block" id="token_required">
@@ -347,7 +380,7 @@
     <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">token</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;jwt-token&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
-            <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+            <span class="n">abort</span><span class="p">(</span><span class="mi">405</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">SECRET_KEY</span><span class="p">,</span> <span class="n">algorithms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;HS256&quot;</span><span class="p">])</span>
             <span class="n">username</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;sub&#39;</span><span class="p">]</span>
@@ -360,6 +393,8 @@
 <div class="viewcode-block" id="login">
 <a class="viewcode-back" href="../../customer.html#customers.app.login">[docs]</a>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;50 per minute&quot;</span><span class="p">)</span>
+<span class="c1">#@mp.profile</span>
 <span class="k">def</span> <span class="nf">login</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Authenticates a user by validating the username and password. If authentication is successful,</span>
@@ -372,6 +407,10 @@
     <span class="n">username</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span>
     <span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;User not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
+    
     <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="n">password</span><span class="p">:</span>
         <span class="n">token</span> <span class="o">=</span> <span class="n">create_token</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
         <span class="n">resp</span> <span class="o">=</span> <span class="n">make_response</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;authentication successful&quot;</span><span class="p">})</span>
@@ -389,7 +428,9 @@
 <div class="viewcode-block" id="delete_customer">
 <a class="viewcode-back" href="../../customer.html#customers.app.delete_customer">[docs]</a>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/delete_customer&quot;</span><span class="p">,</span> <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DELETE&quot;</span><span class="p">])</span>
+<span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;50 per minute&quot;</span><span class="p">)</span>
 <span class="nd">@token_required</span>
+<span class="c1">#@mp.profile</span>
 <span class="k">def</span> <span class="nf">delete_customer</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The logged in user only may delete his account (token required)</span>
@@ -425,7 +466,9 @@
 <div class="viewcode-block" id="update_customer_information">
 <a class="viewcode-back" href="../../customer.html#customers.app.update_customer_information">[docs]</a>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/update_customer_information&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PUT&quot;</span><span class="p">])</span>
+<span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;50 per minute&quot;</span><span class="p">)</span>
 <span class="nd">@token_required</span>
+<span class="c1">#@mp.profile</span>
 <span class="k">def</span> <span class="nf">update_customer_information</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The logged in user only may update his info</span>
@@ -442,25 +485,26 @@
 <span class="sd">    :raises: 400 Bad Request if no valid fields are provided for update.</span>
 <span class="sd">    :raises: 500 Internal Server Error if there is an issue during the update process.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span>  
-    <span class="c1"># Prevent updating wallet value</span>
-    <span class="k">if</span> <span class="s1">&#39;wallet&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-        <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
-    <span class="c1"># Validate if at least one valid field is provided</span>
-    <span class="n">valid_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;marital_status&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">valid_fields</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No valid fields provided for update&quot;</span><span class="p">}),</span> <span class="mi">400</span>
-    
-    <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
-    
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">customer</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Customer not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
-
-    <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">customer</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>  
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">customer</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">customer_schema</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
+        <span class="c1"># Prevent updating wallet value</span>
+        <span class="k">if</span> <span class="s1">&#39;wallet&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+        <span class="c1"># Validate if at least one valid field is provided</span>
+        <span class="n">valid_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;marital_status&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">valid_fields</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No valid fields provided for update&quot;</span><span class="p">}),</span> <span class="mi">400</span>
+        
+        <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">customer</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Customer not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
+
+        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">customer</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>  
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">customer</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
         <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span> <span class="n">customer_schema</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">customer</span><span class="p">)),</span> <span class="mi">200</span>
 
@@ -472,6 +516,8 @@
 <div class="viewcode-block" id="get_all_customers">
 <a class="viewcode-back" href="../../customer.html#customers.app.get_all_customers">[docs]</a>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/get_all_customers&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;50 per minute&quot;</span><span class="p">)</span>
+<span class="c1">#@mp.profile</span>
 <span class="k">def</span> <span class="nf">get_all_customers</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetches all customers from the database.</span>
@@ -494,7 +540,9 @@
 <div class="viewcode-block" id="charge_wallet">
 <a class="viewcode-back" href="../../customer.html#customers.app.charge_wallet">[docs]</a>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/charge_wallet&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;50 per minute&quot;</span><span class="p">)</span>
 <span class="nd">@token_required</span>
+<span class="c1">#@mp.profile</span>
 <span class="k">def</span> <span class="nf">charge_wallet</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Only the logged in customer may charge his account</span>
@@ -531,6 +579,7 @@
 <div class="viewcode-block" id="deduct_wallet">
 <a class="viewcode-back" href="../../customer.html#customers.app.deduct_wallet">[docs]</a>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/deduct_wallet&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;50 per minute&quot;</span><span class="p">)</span>
 <span class="nd">@token_required</span>
 <span class="k">def</span> <span class="nf">deduct_wallet</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -572,7 +621,8 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
         <span class="n">db</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5001</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
 </pre></div>
 
            </div>

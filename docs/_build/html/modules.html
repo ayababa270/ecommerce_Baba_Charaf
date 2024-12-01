@@ -47,6 +47,8 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ecommerce_Baba_Charaf</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="customer.html">customer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="inventory.html">inventory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html">sales module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html">reviews module</a></li>
 </ul>
 </li>
 </ul>
@@ -117,6 +119,7 @@
 <li class="toctree-l2"><a class="reference internal" href="customer.html#customers.app.create_token"><code class="docutils literal notranslate"><span class="pre">create_token()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="customer.html#customers.app.deduct_wallet"><code class="docutils literal notranslate"><span class="pre">deduct_wallet()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="customer.html#customers.app.delete_customer"><code class="docutils literal notranslate"><span class="pre">delete_customer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="customer.html#customers.app.forbidden_error"><code class="docutils literal notranslate"><span class="pre">forbidden_error()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="customer.html#customers.app.get_all_customers"><code class="docutils literal notranslate"><span class="pre">get_all_customers()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="customer.html#customers.app.get_customer_by_username"><code class="docutils literal notranslate"><span class="pre">get_customer_by_username()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="customer.html#customers.app.login"><code class="docutils literal notranslate"><span class="pre">login()</span></code></a></li>
@@ -149,8 +152,71 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="inventory.html#inventory.app.add_good"><code class="docutils literal notranslate"><span class="pre">add_good()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="inventory.html#inventory.app.decrease_stock"><code class="docutils literal notranslate"><span class="pre">decrease_stock()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="inventory.html#inventory.app.delete_good"><code class="docutils literal notranslate"><span class="pre">delete_good()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="inventory.html#inventory.app.get_all_goods"><code class="docutils literal notranslate"><span class="pre">get_all_goods()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="inventory.html#inventory.app.get_good_by_name"><code class="docutils literal notranslate"><span class="pre">get_good_by_name()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="inventory.html#inventory.app.update_good_information"><code class="docutils literal notranslate"><span class="pre">update_good_information()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sales.html">sales module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sales.html#sales.app.Purchase"><code class="docutils literal notranslate"><span class="pre">Purchase</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sales.html#sales.app.Purchase.customer_username"><code class="docutils literal notranslate"><span class="pre">Purchase.customer_username</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sales.html#sales.app.Purchase.good_name"><code class="docutils literal notranslate"><span class="pre">Purchase.good_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sales.html#sales.app.Purchase.id"><code class="docutils literal notranslate"><span class="pre">Purchase.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sales.html#sales.app.Purchase.price"><code class="docutils literal notranslate"><span class="pre">Purchase.price</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sales.html#sales.app.Purchase.purchase_date"><code class="docutils literal notranslate"><span class="pre">Purchase.purchase_date</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sales.html#sales.app.Purchase.query"><code class="docutils literal notranslate"><span class="pre">Purchase.query</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html#sales.app.PurchaseSchema"><code class="docutils literal notranslate"><span class="pre">PurchaseSchema</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sales.html#sales.app.PurchaseSchema.Meta"><code class="docutils literal notranslate"><span class="pre">PurchaseSchema.Meta</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sales.html#sales.app.PurchaseSchema.Meta.fields"><code class="docutils literal notranslate"><span class="pre">PurchaseSchema.Meta.fields</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sales.html#sales.app.PurchaseSchema.opts"><code class="docutils literal notranslate"><span class="pre">PurchaseSchema.opts</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html#sales.app.display_goods"><code class="docutils literal notranslate"><span class="pre">display_goods()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html#sales.app.forbidden_error"><code class="docutils literal notranslate"><span class="pre">forbidden_error()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html#sales.app.get_good_details"><code class="docutils literal notranslate"><span class="pre">get_good_details()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html#sales.app.get_purchase_history"><code class="docutils literal notranslate"><span class="pre">get_purchase_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html#sales.app.make_sale"><code class="docutils literal notranslate"><span class="pre">make_sale()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sales.html#sales.app.token_required"><code class="docutils literal notranslate"><span class="pre">token_required()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reviews.html">reviews module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.Review"><code class="docutils literal notranslate"><span class="pre">Review</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.comment"><code class="docutils literal notranslate"><span class="pre">Review.comment</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.customer_username"><code class="docutils literal notranslate"><span class="pre">Review.customer_username</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.id"><code class="docutils literal notranslate"><span class="pre">Review.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.is_approved"><code class="docutils literal notranslate"><span class="pre">Review.is_approved</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.is_moderated"><code class="docutils literal notranslate"><span class="pre">Review.is_moderated</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.product_name"><code class="docutils literal notranslate"><span class="pre">Review.product_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.query"><code class="docutils literal notranslate"><span class="pre">Review.query</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.rating"><code class="docutils literal notranslate"><span class="pre">Review.rating</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.Review.timestamp"><code class="docutils literal notranslate"><span class="pre">Review.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.ReviewSchema"><code class="docutils literal notranslate"><span class="pre">ReviewSchema</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.ReviewSchema.Meta"><code class="docutils literal notranslate"><span class="pre">ReviewSchema.Meta</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reviews.html#reviews.app.ReviewSchema.Meta.fields"><code class="docutils literal notranslate"><span class="pre">ReviewSchema.Meta.fields</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reviews.html#reviews.app.ReviewSchema.opts"><code class="docutils literal notranslate"><span class="pre">ReviewSchema.opts</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.admin_required"><code class="docutils literal notranslate"><span class="pre">admin_required()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.admin_required_error"><code class="docutils literal notranslate"><span class="pre">admin_required_error()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.delete_review"><code class="docutils literal notranslate"><span class="pre">delete_review()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.forbidden_error"><code class="docutils literal notranslate"><span class="pre">forbidden_error()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.get_customer_reviews"><code class="docutils literal notranslate"><span class="pre">get_customer_reviews()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.get_product_reviews"><code class="docutils literal notranslate"><span class="pre">get_product_reviews()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.get_review_details"><code class="docutils literal notranslate"><span class="pre">get_review_details()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.moderate_review"><code class="docutils literal notranslate"><span class="pre">moderate_review()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.submit_review"><code class="docutils literal notranslate"><span class="pre">submit_review()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.token_required"><code class="docutils literal notranslate"><span class="pre">token_required()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reviews.html#reviews.app.update_review"><code class="docutils literal notranslate"><span class="pre">update_review()</span></code></a></li>
 </ul>
 </li>
 </ul>
