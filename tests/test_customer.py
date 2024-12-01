@@ -22,7 +22,7 @@ def customer1():
             "first_name": "Walter",
             "last_name": "White",
             "username": "walt12",
-            "password": "12345",
+            "password": "123456",
             "age": 50,
             "address": "308 Negra Arroyo Lane, Albuquerque, NM",
             "gender": "male",
@@ -57,7 +57,7 @@ def test_create_customer(client, customer1, customer2):
     assert data['first_name'] == 'Walter'
     assert data['last_name'] == 'White'
     assert data['username'] == 'walt12'
-    assert data['password'] == '12345'
+    assert data['password'] == '123456'
     assert data['age'] == 50
     assert data['address'] == '308 Negra Arroyo Lane, Albuquerque, NM'
     assert data['gender'] == 'male'

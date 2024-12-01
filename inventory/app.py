@@ -114,14 +114,14 @@ goods_list_schema = GoodsSchema(many=True)
 
 
 @app.route('/goods', methods=['GET'])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 def get_all_goods():
     goods = Goods.query.all()
     return jsonify(goods_list_schema.dump(goods)), 200
 
 
 @app.route('/goods/<string:good_name>', methods=['GET'])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 def get_good_by_name(good_name):
     good = Goods.query.filter_by(name=good_name).first()
     if not good:
@@ -130,7 +130,7 @@ def get_good_by_name(good_name):
 
 
 @app.route('/decrease_stock/<string:good_name>', methods=['POST'])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 def decrease_stock(good_name):
     good = Goods.query.filter_by(name=good_name).first()
     if not good:
@@ -147,7 +147,7 @@ def decrease_stock(good_name):
 
 
 @app.route('/add_good', methods=['POST'])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 #@mp.profile
 def add_good():
     """
@@ -181,7 +181,7 @@ def add_good():
         return jsonify({"error": f"An error occurred while adding the good: {str(e)}"}), 500
 
 @app.route('/delete_good/<int:product_id>', methods=['DELETE'])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 #@mp.profile
 def delete_good(product_id):
     """
@@ -213,7 +213,7 @@ def delete_good(product_id):
 
 
 @app.route("/update_good/<int:product_id>", methods=["PUT"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 #@mp.profile
 def update_good_information(product_id):
     """

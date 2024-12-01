@@ -146,7 +146,7 @@ customer_schema = CustomerSchema()
 customers_schema = CustomerSchema(many=True)
 
 @app.route("/create_customer", methods = ["POST"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 #@mp.profile
 def create_customer():
     """
@@ -158,26 +158,28 @@ def create_customer():
     - If a database error occurs: JSON error message and status code 500.
     :rtype: tuple[dict, int]
     """
-    data = request.json
-
-    if not all(field in data for field in ['first_name', 'last_name', 'username', 'password', 'age', 'address', 'gender', 'marital_status']):
-        return jsonify({"error": "Missing required fields"}), 400
-    
-    if not isinstance(data['age'], int):
-        return jsonify({"error": "bad age"}), 400
-
-    new_customer = Customer(
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        username=data['username'],
-        password=data['password'],
-        age=data['age'],  
-        address=data['address'],
-        gender=data['gender'],
-        marital_status=data['marital_status']
-    )
-
     try:
+
+        data = customer_schema.load(request.json)
+
+        if not all(field in data for field in ['first_name', 'last_name', 'username', 'password', 'age', 'address', 'gender', 'marital_status']):
+            return jsonify({"error": "Missing required fields"}), 400
+        
+        if not isinstance(data['age'], int):
+            return jsonify({"error": "bad age"}), 400
+
+        new_customer = Customer(
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            username=data['username'],
+            password=data['password'],
+            age=data['age'],  
+            address=data['address'],
+            gender=data['gender'],
+            marital_status=data['marital_status']
+        )
+
+    
         # Add the customer to the session and commit
         db.session.add(new_customer)
         db.session.commit()
@@ -191,7 +193,7 @@ def create_customer():
     
 
 @app.route("/get_customer_by_username/<username>", methods=["GET"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 #@mp.profile
 def get_customer_by_username(username):
     """
@@ -269,7 +271,7 @@ def token_required(f):
     return decorator
 
 @app.route("/login", methods = ["POST"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 #@mp.profile
 def login():
     """
@@ -301,7 +303,7 @@ def login():
     abort(403)
 
 @app.route("/delete_customer", methods = ["DELETE"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 @token_required
 #@mp.profile
 def delete_customer(username, token):
@@ -336,7 +338,7 @@ def delete_customer(username, token):
         return jsonify({"error": str(e)}), 500
 
 @app.route("/update_customer_information", methods=["PUT"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 @token_required
 #@mp.profile
 def update_customer_information(username, token):
@@ -383,7 +385,7 @@ def update_customer_information(username, token):
         return jsonify({"error": str(e)}), 500
 
 @app.route("/get_all_customers", methods=["GET"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 #@mp.profile
 def get_all_customers():
     """
@@ -404,7 +406,7 @@ def get_all_customers():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/charge_wallet", methods=["POST"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 @token_required
 #@mp.profile
 def charge_wallet(username, token):
@@ -440,7 +442,7 @@ def charge_wallet(username, token):
         return jsonify({"error": str(e)}), 500
 
 @app.route("/deduct_wallet", methods=["POST"])
-@limiter.limit("50 per minute")
+@limiter.limit("100 per minute")
 @token_required
 def deduct_wallet(username, token):
     """
