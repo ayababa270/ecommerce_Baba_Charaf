@@ -10,9 +10,26 @@ from pybreaker import CircuitBreaker, CircuitBreakerError
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from marshmallow import validates, ValidationError
+from werkzeug.middleware.profiler import ProfilerMiddleware
+import memory_profiler as mp
+
+
 
 
 app = Flask(__name__)
+
+# Define the profiling directory relative to the current file
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROFILE_DIR = os.path.join(BASE_DIR, 'performance_profiler', 'reviews')
+
+# Create the profiling directory if it doesn't exist
+os.makedirs(PROFILE_DIR, exist_ok=True)
+
+app.wsgi_app = ProfilerMiddleware(
+    app.wsgi_app,
+    profile_dir=PROFILE_DIR,
+    restrictions=('app.py',)  # Adjust as needed
+)
 
 # Set up database
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
@@ -238,6 +255,7 @@ inventory_circuit_breaker = CircuitBreaker(
 @app.route('/reviews', methods=['POST'])
 @token_required
 @limiter.limit("100 per minute")
+@mp.profile
 def submit_review(customer_username):
     """
     Submit a new review for a product.
@@ -285,6 +303,7 @@ def submit_review(customer_username):
 @app.route('/reviews/<int:review_id>', methods=['PUT'])
 @token_required
 @limiter.limit("100 per minute")
+@mp.profile
 def update_review(customer_username, review_id):
     """
     Update an existing review.
@@ -331,6 +350,7 @@ def update_review(customer_username, review_id):
 @app.route('/reviews/<int:review_id>', methods=['DELETE'])
 @token_required
 @limiter.limit("100 per minute")
+@mp.profile
 def delete_review(customer_username, review_id):
     """
     Delete a review.
@@ -362,6 +382,7 @@ def delete_review(customer_username, review_id):
 # Endpoint 4: Get Product Reviews
 @app.route('/reviews/product/<string:product_name>', methods=['GET'])
 @limiter.limit("100 per minute")
+@mp.profile
 def get_product_reviews(product_name):
     """
     Get all approved reviews for a product.
@@ -379,6 +400,7 @@ def get_product_reviews(product_name):
 # Endpoint 5: Get Customer Reviews
 @app.route('/reviews/customer/<string:customer_username>', methods=['GET'])
 @limiter.limit("100 per minute")
+@mp.profile
 def get_customer_reviews(customer_username):
     """
     Get all reviews written by a customer.
@@ -398,6 +420,7 @@ def get_customer_reviews(customer_username):
 @token_required
 @admin_required
 @limiter.limit("100 per minute")
+@mp.profile
 def moderate_review(admin_username, review_id):
     """
     Moderate a review (admin only).
@@ -434,6 +457,7 @@ def moderate_review(admin_username, review_id):
 # Endpoint 7: Get Review Details
 @app.route('/reviews/<int:review_id>', methods=['GET'])
 @limiter.limit("100 per minute")
+@mp.profile
 def get_review_details(review_id):
     """
     Get details of a specific review.

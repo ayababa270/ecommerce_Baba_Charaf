@@ -8,8 +8,8 @@ import jwt
 import datetime
 from marshmallow import validates, ValidationError
 import os
-#from werkzeug.middleware.profiler import ProfilerMiddleware
-#import memory_profiler as mp
+from werkzeug.middleware.profiler import ProfilerMiddleware
+import memory_profiler as mp
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
