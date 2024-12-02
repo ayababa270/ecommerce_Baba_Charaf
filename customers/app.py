@@ -14,9 +14,10 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
+os.makedirs("./performance_profiler/customer", exist_ok=True)
 
 # Uncomment this to profile again
-#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/customer", restrictions=('app.py',))
+app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./performance_profiler/customer", restrictions=('app.py',))
 
 limiter = Limiter(
     get_remote_address,  # Uses client's IP address for rate-limiting
