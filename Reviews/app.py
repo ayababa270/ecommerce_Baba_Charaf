@@ -95,6 +95,36 @@ class ReviewSchema(ma.Schema):
         :vartype fields: tuple
         """
         fields = ("id", "customer_username", "product_name", "rating", "comment", "is_moderated", "is_approved", "timestamp")
+        
+    @validates('customer_username')
+    def validate_customer_username(self, value):
+        if not value or len(value) < 5:
+            raise ValidationError("Customer username must be at least 5 characters long.")
+
+    @validates('product_name')
+    def validate_product_name(self, value):
+        if not value or len(value) < 2:
+            raise ValidationError("Product name must be at least 2 characters long.")
+
+    @validates('rating')
+    def validate_rating(self, value):
+        if not isinstance(value, int) or value < 1 or value > 5:
+            raise ValidationError("Rating must be an integer between 1 and 5.")
+
+    @validates('comment')
+    def validate_comment(self, value):
+        if value and len(value) > 500:
+            raise ValidationError("Comment cannot be more than 500 characters.")
+
+    @validates('is_moderated')
+    def validate_is_moderated(self, value):
+        if not isinstance(value, bool):
+            raise ValidationError("is_moderated must be a boolean.")
+
+    @validates('is_approved')
+    def validate_is_approved(self, value):
+        if not isinstance(value, bool):
+            raise ValidationError("is_approved must be a boolean.")
 
 review_schema = ReviewSchema()
 reviews_schema = ReviewSchema(many=True)

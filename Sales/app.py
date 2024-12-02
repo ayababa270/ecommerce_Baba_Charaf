@@ -83,6 +83,21 @@ class PurchaseSchema(ma.Schema):
         :vartype fields: tuple
         """
         fields = ("id", "customer_username", "good_name", "purchase_date", "price")
+        
+    @validates('customer_username')
+    def validate_customer_username(self, value):
+        if not value or len(value) < 5:
+            raise ValidationError("Customer username must be at least 5 characters long.")
+
+    @validates('good_name')
+    def validate_good_name(self, value):
+        if not value or len(value) < 2:
+            raise ValidationError("Good name must be at least 2 characters long.")
+
+    @validates('price')
+    def validate_price(self, value):
+        if value is None or value <= 0:
+            raise ValidationError("Price must be a positive number.")
 
 purchase_schema = PurchaseSchema()
 purchases_schema = PurchaseSchema(many=True)
